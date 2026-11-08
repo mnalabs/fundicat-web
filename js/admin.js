@@ -26,7 +26,7 @@
   let dirty = false;
   let orders = [];
   let quotes = [];
-  const ui = { productFilter: 'all', productQuery: '', orderFilter: 'preparar', tab: {} };
+  const ui = { productFilter: 'all', productQuery: '', orderFilter: 'preparar', tab: {}, sec: {} };
 
   // Qualsevol error de sessió caducada torna a la pantalla d'accés.
   function handle(err) {
@@ -235,9 +235,11 @@
       <div class="shell">
         <nav class="side" aria-label="Administració">
           ${nav('inici', 'Inici')}
+          <p class="side-group">Vendes</p>
           ${nav('comandes', 'Comandes', newOrders)}
-          ${nav('seguiment', 'Seguiment')}
+          ${nav('seguiment', 'Enviaments')}
           ${nav('pressupostos', 'Pressupostos', newQuotes)}
+          <p class="side-group">Botiga</p>
           ${nav('productes', 'Productes')}
           ${nav('portada', 'Portada')}
           ${nav('anuncis', 'Anuncis')}
@@ -304,6 +306,25 @@
       };
       $$('button', tabs).forEach((b) => b.addEventListener('click', () => show(b.dataset.lang)));
       show(ui.tab[key] || 'es');
+    });
+  }
+
+  // Pestanyes d'apartat: amaguen els blocs [data-sec] que no toquen (els camps
+  // continuen al document, així no es perd cap canvi en passar d'una a l'altra).
+  const secTabs = (key, tabs) => {
+    const cur = tabs.some(([k]) => k === ui.sec[key]) ? ui.sec[key] : tabs[0][0];
+    return `<div class="sec-tabs" role="tablist" data-sec-tabs="${key}">${tabs.map(([k, label]) => `<button type="button" role="tab" data-sec-tab="${k}" aria-selected="${k === cur}">${label}</button>`).join('')}</div>`;
+  };
+  function bindSecTabs(root) {
+    $$('[data-sec-tabs]', root).forEach((bar) => {
+      const key = bar.dataset.secTabs;
+      const show = (k) => {
+        ui.sec[key] = k;
+        $$('[data-sec-tab]', bar).forEach((b) => b.setAttribute('aria-selected', String(b.dataset.secTab === k)));
+        $$(`[data-sec^="${key}:"]`, root).forEach((el) => { el.hidden = !el.dataset.sec.split(' ').includes(`${key}:${k}`); });
+      };
+      $$('[data-sec-tab]', bar).forEach((b) => b.addEventListener('click', () => { show(b.dataset.secTab); window.scrollTo(0, 0); }));
+      show($('[aria-selected="true"]', bar).dataset.secTab);
     });
   }
 
@@ -401,16 +422,17 @@
           <h1><a class="back" href="#/productes" aria-label="Torna als productes">←</a>${esc(p.name || 'Producte nou')} ${statusBadge(p)}</h1>
           ${p.status === 'active' && saved.products.some((x) => x.id === p.id) ? `<a class="btn btn-ghost" href="/#/producte/${esc(p.slug)}" target="_blank" rel="noopener">Veure a la botiga ↗</a>` : ''}
         </div>
+        ${secTabs("prod", [["general", "General"], ["preu", "Preu i estoc"], ["enviament", "Enviament"], ["detalls", "Més detalls"], ["traduccions", "Traduccions"]])}
         <div class="grid-2">
           <div class="col">
-            <section class="card">
+            <section class="card" data-sec="prod:general">
               <label class="field"><span>Títol</span><input data-f="name" maxlength="200" required></label>
               <label class="field"><span>Variant</span><input data-f="variant" placeholder="5 kg, Acer · 40 cm…" maxlength="200"></label>
               <label class="field"><span>Resum</span><input data-f="short" maxlength="500"><small>Una frase. Surt sota el títol i a les cerques.</small></label>
               <label class="field"><span>Descripció</span><textarea data-f="description" data-type="paras" rows="6"></textarea><small>Separa els paràgrafs amb una línia en blanc.</small></label>
             </section>
 
-            <section class="card">
+            <section class="card" data-sec="prod:general">
               <div class="card-head"><h2>Multimèdia</h2><span class="muted small">La primera imatge és la principal</span></div>
               <div class="media-grid" id="media">
                 ${(p.images || []).map((src, i) => `
@@ -431,7 +453,7 @@
               ${(p.images || []).length ? '' : `<label class="field"><span>Il·lustració provisional</span><select data-f="art">${ARTS.map(([v, l]) => `<option value="${v}">${l}</option>`).join('')}</select><small>Es mostra mentre no hi hagi cap foto.</small></label>`}
             </section>
 
-            <section class="card">
+            <section class="card" data-sec="prod:preu">
               <h2>Preu</h2>
               <div class="row">
                 <label class="field"><span>Preu (IVA inclòs)</span><div class="prefix" data-suffix="€"><input data-f="price" data-type="number" type="number" min="0" step="0.01"></div></label>
@@ -443,7 +465,7 @@
               </div>
             </section>
 
-            <section class="card">
+            <section class="card" data-sec="prod:preu">
               <h2>Inventari</h2>
               <div class="row">
                 <label class="field"><span>Referència (SKU)</span><input data-f="sku" maxlength="80"></label>
@@ -451,7 +473,7 @@
               </div>
             </section>
 
-            <section class="card">
+            <section class="card" data-sec="prod:enviament">
               <h2>Enviament</h2>
               <div class="row">
                 <label class="field"><span>Pes amb embalatge</span><div class="prefix" data-suffix="kg"><input data-f="weight" data-type="number" type="number" min="0.05" step="0.05"></div><small>Amb el pes es calcula el preu d'enviament.</small></label>
@@ -466,12 +488,17 @@
               ${p.oversize ? '<label class="field" style="max-width:240px"><span>Preu d\'enviament fix</span><div class="prefix" data-suffix="€"><input data-f="shipFixed" data-type="number" type="number" min="0" step="0.05"></div><small>No es crea etiqueta automàtica: la prepares tu.</small></label>' : ''}
             </section>
 
-            <section class="card">
+            <section class="card" data-sec="prod:detalls">
               <div class="card-head"><h2>Especificacions</h2><button type="button" class="btn btn-plain" id="add-spec">+ Afegeix</button></div>
               <div class="kv" id="specs">${Object.entries(p.specs || {}).map(([k, v]) => specRow(k, v)).join('') || '<p class="muted small" data-empty>Sense especificacions.</p>'}</div>
             </section>
 
-            <section class="card">
+            <section class="card" data-sec="prod:detalls">
+              <h2>Es compren junts</h2>
+              <p class="muted small">Fins a 6 productes. Surten a "Es compren junts sovint" i a les recomanacions.</p>
+              <div class="checks" id="related">${others.map((o) => `<label><input type="checkbox" value="${esc(o.id)}" ${(p.related || []).includes(o.id) ? 'checked' : ''}> ${esc(o.name)} <span class="muted">${esc(o.variant)}</span></label>`).join('')}</div>
+            </section>
+            <section class="card" data-sec="prod:traduccions">
               <h2>Traduccions</h2>
               <p class="muted small">Si deixes un camp buit, es fa servir la traducció per defecte o el text en català.</p>
               <div class="tabs" data-tabs="p-tr" role="tablist">${LANGS.map(([l, n]) => `<button type="button" role="tab" data-lang="${l}">${n}</button>`).join('')}</div>
@@ -496,11 +523,6 @@
               <label class="field"><span>Etiqueta</span><input data-f="badge" placeholder="Més venut, Nou…" maxlength="40"></label>
               <label class="field" style="display:flex;align-items:center;gap:8px"><input type="checkbox" data-f="exemple" style="width:auto;min-height:0"> <span>Marcar com a producte d'exemple</span></label>
             </section>
-            <section class="card">
-              <h2>Es compren junts</h2>
-              <p class="muted small">Fins a 6 productes. Surten a "Es compren junts sovint" i a les recomanacions.</p>
-              <div class="checks" id="related">${others.map((o) => `<label><input type="checkbox" value="${esc(o.id)}" ${(p.related || []).includes(o.id) ? 'checked' : ''}> ${esc(o.name)} <span class="muted">${esc(o.variant)}</span></label>`).join('')}</div>
-            </section>
             <button type="button" class="btn btn-danger" id="delete">Elimina el producte</button>
           </div>
         </div>
@@ -520,6 +542,7 @@
     if (id === 'nou') {
       const p = { id: uid('p'), name: 'Producte nou', variant: '', status: 'draft', price: 0, stock: 0, sku: '', category: draft.categories[0].id, art: 'bag', images: [], short: '', description: [], specs: {}, tiers: [], related: [], i18n: {} };
       draft.products.unshift(p);
+      ui.sec.prod = "general";
       markDirty();
       location.replace(`#/productes/${p.id}`);
       return;
@@ -535,6 +558,7 @@
     });
     net();
     bindTabs(main);
+    bindSecTabs(main);
 
     // Imatges
     bindDrop($('.drop', main), async (files) => {
@@ -1050,7 +1074,7 @@
     const head = '<tr><th>Comanda</th><th class="hide-sm">Transportista i seguiment</th><th>Sortida</th><th>Previst</th><th></th></tr>';
     return `
       <div class="page">
-        <div class="page-head"><h1>Seguiment dels paquets</h1></div>
+        <div class="page-head"><h1>Enviaments</h1></div>
         <div class="kpis">
           <div class="kpi"><span>En camí</span><b>${sent.length}</b></div>
           <div class="kpi"><span>Amb retard</span><b class="${late.length ? 'low' : ''}">${late.length}</b></div>
@@ -1147,7 +1171,8 @@
   VIEWS.configuracio = () => `
     <div class="page page-narrow">
       <div class="page-head"><h1>Configuració</h1></div>
-      <section class="card" id="mobil">
+      ${secTabs("cfg", [["enviaments", "Enviaments"], ["pagaments", "Pagaments i impostos"], ["connexions", "Connexions i avisos"], ["compte", "Compte"]])}
+      <section class="card" id="mobil" data-sec="cfg:connexions">
         <h2>Avisos i app al mòbil</h2>
         <p class="muted small">Rep un avís en aquest dispositiu cada vegada que entri una comanda pagada, una comanda per transferència o una petició de pressupost. Activa'ls a cada mòbil o ordinador on els vulguis rebre.</p>
         <div id="push-box"><p class="muted small">Comprovant…</p></div>
@@ -1160,7 +1185,7 @@
           <button class="btn btn-ghost" id="install-btn" type="button" ${installPrompt ? '' : 'hidden'}>Instal·la el panell</button>`}
         </div>
       </section>
-      <section class="card">
+      <section class="card" data-sec="cfg:connexions">
         <h2>Connexions</h2>
         <dl class="meta">
           <div><dt>Pagaments amb targeta (Stripe)</dt><dd>${BE.stripe ? '<span class="badge badge-ok">Connectat</span>' : '<span class="badge">No connectat</span> <span class="muted small">Les comandes amb targeta queden pendents de pagament.</span>'}</dd></div>
@@ -1179,7 +1204,7 @@
         </div>`;
         })() : ''}
       </section>
-      <section class="card card-flush">
+      <section class="card card-flush" data-sec="cfg:enviaments">
         <div class="toolbar"><h2 style="flex:1">Tarifes d'enviament</h2><span class="muted small">IVA inclòs · per pes total de la comanda</span></div>
         <div style="overflow-x:auto">
           <table class="list ship-table">
@@ -1200,7 +1225,7 @@
           ${BE.sendcloud ? '<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-f="config.shipping.autoLabel"> Crear les etiquetes automàticament quan entra una comanda</label>' : '<p class="muted small">Les etiquetes automàtiques i reals s\'activaran quan connectem Sendcloud. Mentrestant, les etiquetes són de prova.</p>'}
         </div>
       </section>
-      <section class="card">
+      <section class="card" data-sec="cfg:enviaments">
         <h2>Transportistes amb preu real (Packlink)</h2>
         <p class="muted small">Quan s'activa, el client veu al pagament els transportistes disponibles per a la seva adreça, amb el preu real de cadascun, i tria el que vol. Si Packlink no respon, la botiga fa servir les tarifes fixes de més amunt.</p>
         <dl class="meta"><div><dt>Connexió amb Packlink</dt><dd>${BE.packlink ? '<span class="badge badge-ok">Clau configurada</span>' : '<span class="badge">No connectat</span> <span class="muted small">Falta la clau <code>PACKLINK_API_KEY</code> a Supabase → Edge Functions → Secrets.</span>'}</dd></div></dl>
@@ -1217,7 +1242,7 @@
           <label class="field"><span>Alt</span><div class="prefix" data-suffix="cm"><input data-f="config.shipping.packlink.box.h" data-type="number" type="number" min="1" max="300" step="0.5"></div></label>
         </div>
       </section>
-      <section class="card card-flush">
+      <section class="card card-flush" data-sec="cfg:enviaments">
         <div class="toolbar"><h2 style="flex:1">Dies d'entrega</h2><span class="muted small">Dies laborables (dilluns a divendres)</span></div>
         <div style="padding:12px 16px;display:grid;gap:12px">
           <p class="muted small">Es fan servir per dir al client la data estimada d'entrega a la fitxa del producte, al pagament i a la pàgina de seguiment. Són una estimació, no una garantia: ajusta-les a com triguen els teus enviaments de debò.</p>
@@ -1237,7 +1262,7 @@
           <p class="muted small">L'enviament express sempre es calcula a 1 dia de trànsit.</p>
         </div>
       </section>
-      <section class="card">
+      <section class="card" data-sec="cfg:compte">
         <h2>Contrasenya del panell</h2>
         <form id="pw-form" class="col" autocomplete="off">
           <label class="field"><span>Contrasenya actual</span><input type="password" name="current" autocomplete="current-password" required></label>
@@ -1248,7 +1273,7 @@
           <button class="btn" type="submit" style="justify-self:start">Canvia la contrasenya</button>
         </form>
       </section>
-      <section class="card">
+      <section class="card" data-sec="cfg:pagaments">
         <h2>Transferències</h2>
         <p class="muted small">Es mostren al client quan tria pagar per transferència.</p>
         <div class="row">
@@ -1256,14 +1281,15 @@
           <label class="field"><span>Titular</span><input data-f="config.bank.holder" placeholder="Fundicat SL" maxlength="80"></label>
         </div>
       </section>
-      <section class="card">
+      <section class="card" data-sec="cfg:pagaments">
         <h2>Impostos</h2>
         <label class="field" style="max-width:220px"><span>IVA</span><div class="prefix" data-suffix="%"><input data-f="config.vat" data-type="percent" type="number" min="0" max="50" step="0.5"></div><small>Els preus del catàleg ja l'inclouen.</small></label>
       </section>
-      <div class="note">Pendent de connectar: correus automàtics als clients i facturació (Verifactu).</div>
+      <div class="note" data-sec="cfg:connexions">Pendent de connectar: correus automàtics als clients i facturació (Verifactu).</div>
     </div>`;
   BINDS.configuracio = () => {
     bindFields($('#main'), draft);
+    bindSecTabs($('#main'));
     paintPush();
     $('#install-btn')?.addEventListener('click', async () => {
       if (!installPrompt) return;

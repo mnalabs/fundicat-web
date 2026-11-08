@@ -59,6 +59,14 @@ img { display: block; max-width: 100%; }
 .side a svg { width: 18px; height: 18px; color: var(--muted); flex: none; }
 .side a .count { margin-left: auto; background: #d4d4d4; border-radius: 99px; padding: 0 7px; font-size: .72rem; }
 .side hr { border: 0; border-top: 1px solid #d9d9d9; margin: 10px 6px; }
+.side-group { margin: 16px 10px 4px; font-size: .72rem; font-weight: 600; color: var(--muted); }
+[hidden] { display: none !important; }
+/* Pestanyes d'apartat (fitxa de producte, Configuració) */
+.sec-tabs { display: flex; gap: 4px; margin: 0 0 16px; padding: 4px; background: #ebebeb; border-radius: 10px; overflow-x: auto; scrollbar-width: none; }
+.sec-tabs::-webkit-scrollbar { display: none; }
+.sec-tabs button { flex: none; border: 0; background: none; padding: 7px 14px; border-radius: 7px; cursor: pointer; font: inherit; font-size: .86rem; font-weight: 550; color: var(--muted); white-space: nowrap; }
+.sec-tabs button:hover { color: var(--ink); }
+.sec-tabs button[aria-selected="true"] { background: #fff; color: var(--ink); box-shadow: var(--shadow); }
 .main { padding: 24px 32px 96px; min-width: 0; }
 .page { max-width: 1000px; margin: 0 auto; display: grid; gap: 16px; }
 .page-narrow { max-width: 760px; }
@@ -143,7 +151,7 @@ table.list { width: 100%; border-collapse: collapse; }
 .media-item .tools button { border: 0; border-radius: 6px; background: rgba(255, 255, 255, .95); box-shadow: var(--shadow); padding: 3px 7px; font-size: .74rem; cursor: pointer; font-weight: 550; }
 .media-item .main-tag { position: absolute; left: 6px; top: 6px; background: rgba(0, 0, 0, .7); color: #fff; font-size: .7rem; padding: 2px 6px; border-radius: 6px; }
 .drop { border: 1.5px dashed var(--line-strong); border-radius: 10px; display: grid; place-items: center; text-align: center; padding: 18px; color: var(--muted); cursor: pointer; aspect-ratio: 1; gap: 6px; font-size: .8rem; transition: background .15s, border-color .15s; }
-.drop.wide { aspect-ratio: auto; padding: 28px; }
+.drop.wide { aspect-ratio: auto; padding: 28px; grid-column: 1 / -1; }
 .drop:hover, .drop.is-over { background: #f7f7f7; border-color: var(--ink); color: var(--ink); }
 .drop input { display: none; }
 .drop b { color: var(--ink); font-weight: 550; }
