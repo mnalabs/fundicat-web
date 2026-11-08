@@ -158,10 +158,13 @@
 
   // Simulats: retornen promeses perquè la versió real (fetch) encaixi igual.
   const payments = {
-    methods: [
-      { id: 'card', name: 'Targeta', note: 'Visa, Mastercard, Apple Pay o Google Pay. Pagament segur amb Stripe.' },
-      { id: 'transfer', name: 'Transferència', note: 'Per a empreses · enviament en rebre el pagament' },
-    ],
+    // La transferència només surt si hi ha IBAN a Configuració → Pagaments.
+    get methods() {
+      return [
+        { id: 'card', name: 'Targeta', note: 'Visa, Mastercard, Apple Pay o Google Pay. Pagament segur amb Stripe.' },
+        { id: 'transfer', name: 'Transferència', note: 'Per a empreses · enviament en rebre el pagament' },
+      ].filter((m) => m.id !== 'transfer' || !!CFG.bank?.iban);
+    },
     // El servidor recalcula els preus: el navegador només envia ids i quantitats.
     // Amb targeta, es crea el pagament a Stripe (funció "botiga") i es torna l'enllaç
     // a la pàgina de pagament; la cistella es buida quan Stripe confirma el cobrament.

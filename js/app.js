@@ -225,7 +225,9 @@
 
   views.home = () => {
     const kit = catalog.byId('kit-inici');
-    const free = pricing.rawMoney((config.shipping.zones?.[0]?.freeFrom || 60));
+    const freeFrom = config.shipping.zones?.[0]?.freeFrom || 0;
+    const free = pricing.rawMoney(freeFrom);
+    const hasTiers = catalog.list({}).some((p) => (p.tiers || []).length);
     const cats = catalog.categories().map((c) => ({ c, p: catalog.list({ cat: c.id })[0] })).filter((x) => x.p || x.c.image);
     const h = catalog.home();
     return `
@@ -244,8 +246,8 @@
 
     <section class="trust">
       <div class="wrap trust-grid">
-        <div>${ICON.truck}<span><b>${t('Enviament en 24–48 h')}</b>${t('Gratis a partir de {free}.', { free })}</span></div>
-        <div>${ICON.stack}<span><b>${t('Preus per volum')}</b>${t('Descompte automàtic a la cistella.')}</span></div>
+        <div>${ICON.truck}<span><b>${t('Tria el transportista')}</b>${freeFrom > 0 ? t('Gratis a partir de {free}.', { free }) : t('Preu real de cada transportista, al pagament.')}</span></div>
+        ${hasTiers ? `<div>${ICON.stack}<span><b>${t('Preus per volum')}</b>${t('Descompte automàtic a la cistella.')}</span></div>` : `<div>${ICON.stack}<span><b>${t('Pagament segur')}</b>${t('Amb targeta, a la pàgina segura de Stripe.')}</span></div>`}
         <div>${ICON.doc}<span><b>${t('Factura d\'empresa')}</b>${t('Amb NIF i preus sense IVA.')}</span></div>
         <div>${PIN}<span><b>${t('Fet a Manresa')}</b>${t('Taller propi a la Catalunya central.')}</span></div>
       </div>
@@ -278,8 +280,8 @@
             <ol>
               ${[
                 ['Explica\'ns què necessites', 'Un plànol, una foto, una mostra o només la idea.'],
-                ['Rep el pressupost en 24 h', 'Preu per unitat i per volum, sense compromís.'],
-                ['Fabriquem i t\'ho enviem', 'Normalment en una setmana, des de Manresa.'],
+                ['Rep el pressupost', 'Preu per unitat i per volum, sense compromís.'],
+                ['Fabriquem i t\'ho enviem', 'Des del nostre taller de Manresa.'],
               ].map(([h, p], i) => `<li><span class="n">${i + 1}</span><div><b>${t(h)}</b><span>${t(p)}</span></div></li>`).join('')}
             </ol>
             ${catalog.customParts()[0] ? `<p class="quick-proof">${t('Preus de referència: {part}, des de {price}/u.', { part: esc(catalog.customParts()[0].name), price: pricing.rawMoney(catalog.customParts()[0].unit) })}</p>` : ''}
@@ -421,7 +423,9 @@
           ${p.stock < 10 ? `<span class="low">${t('Només en queden {n}.', { n: p.stock })}</span>` : `<span class="ok">${t('En estoc.')}</span>`}
           <span><b>${t('Enviament:')}</b> ${p.oversize
             ? t('per agència, {price} a la Península.', { price: m(p.shipFixed || 0) })
-            : t('des de {price} a la Península, gratuït a partir de {free}.', { price: m(SHIP.fromPrice(config.shipping, p) ?? 0), free: pricing.rawMoney(config.shipping.zones?.[0]?.freeFrom || 60) })} ${t('Entrega estimada a la Península: {range}.', { range: etaRange('peninsula', 'home') })}</span>
+            : config.shipping.packlink?.enabled ? t('el tries al pagament, amb el preu real de cada transportista.')
+            : (config.shipping.zones?.[0]?.freeFrom || 0) > 0 ? t('des de {price} a la Península, gratuït a partir de {free}.', { price: m(SHIP.fromPrice(config.shipping, p) ?? 0), free: pricing.rawMoney(config.shipping.zones[0].freeFrom) })
+            : t('des de {price} a la Península.', { price: m(SHIP.fromPrice(config.shipping, p) ?? 0) })} ${t('Entrega estimada a la Península: {range}.', { range: etaRange('peninsula', 'home') })}</span>
           ${config.shipping.pickup?.enabled ? `<span><b>${t('Recollida:')}</b> ${t('gratuïta al taller de Manresa.')}</span>` : ''}
           <span><b>${t('Devolucions:')}</b> ${t('14 dies.')}</span>
         </div>
@@ -444,15 +448,16 @@
       return `<section class="wrap empty-cart"><h1>${t('La cistella és buida.')}</h1><p class="lead">${t('La PetroBond és un bon punt de partida.')}</p><a class="btn btn-lg" href="#/botiga">${t('Continua comprant')}</a></section>`;
     }
     const tot = cart.totals();
-    const pct = Math.min(100, (tot.subtotal / (config.shipping.zones?.[0]?.freeFrom || 60)) * 100);
+    const freeFrom = config.shipping.zones?.[0]?.freeFrom || 0;
+    const pct = freeFrom > 0 ? Math.min(100, (tot.subtotal / freeFrom) * 100) : 0;
     return `
     <section class="wrap page-head"><h1>${t('Cistella')}</h1><p class="lead">${t('Total: {total}', { total: m(tot.total) })}</p></section>
     <section class="wrap checkout-grid">
       <div>
-        <div class="ship-meter">
+        ${freeFrom > 0 ? `<div class="ship-meter">
           <p>${tot.toFree > 0 ? t('Afegeix {amount} més per tenir enviament gratuït.', { amount: pricing.rawMoney(tot.toFree) }) : t('Tens enviament gratuït.')}</p>
           <div class="meter"><span style="width:${pct}%"></span></div>
-        </div>
+        </div>` : ''}
         <ul class="lines">
           ${lines.map((l) => `
           <li class="line">
@@ -578,7 +583,7 @@
       ${checkoutSummary(tot)}
     </form>`;
   };
-  const checkoutSummary = (tot) => summary(tot, `<button class="btn btn-lg btn-block" type="submit" ${tot.option ? '' : 'disabled'}>${t('Paga {total}', { total: m(tot.total) })}</button>`, tot.option ? (tot.option.kind === 'carrier' ? esc(tot.option.carrier) : shipName(tot.option.id)) : t('Enviament'));
+  const checkoutSummary = (tot) => summary(tot, `<button class="btn btn-lg btn-block" type="submit" ${tot.option ? '' : 'disabled'}>${t('Paga {total}', { total: m(tot.total) })}</button><p class="muted small legal-note">${t('En pagar acceptes les {link}.', { link: `<a href="#/legal/condicions">${t('condicions de venda')}</a>` })}</p>`, tot.option ? (tot.option.kind === 'carrier' ? esc(tot.option.carrier) : shipName(tot.option.id)) : t('Enviament'));
 
   views.comanda = (params) => {
     const o = payments.lastOrder();
@@ -755,6 +760,14 @@
       </div>
     </section>
     <section class="section" id="pressupost">${quoteForm()}</section>`;
+
+  // ---------- Textos legals (js/legal.js) ----------
+  views.legal = (_, page) => {
+    const L = window.FundicatLegal;
+    if (!L || !L.pages.includes(page)) return views.notFound();
+    const lang = window.I18N.lang;
+    return `<article class="wrap legal"><h1>${esc(L.title(page, lang))}</h1>${L.html(page, lang, config)}</article>`;
+  };
 
   views.notFound = () => `<section class="wrap empty-cart"><h1>${t('No hem trobat aquesta pàgina.')}</h1><a class="btn" href="#/">${t('Torna a l\'inici')}</a></section>`;
 

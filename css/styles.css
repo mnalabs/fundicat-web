@@ -622,3 +622,12 @@ a.contact-card b { color: var(--link); }
 .track-dl div { display: flex; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
 .track-dl dt { color: var(--muted); }
 .track-dl dd { margin: 0; text-align: right; overflow-wrap: anywhere; }
+
+/* Textos legals */
+.legal { max-width: 760px; padding-block: 64px 80px; display: grid; gap: 14px; line-height: 1.6; }
+.legal h1 { margin-bottom: 8px; }
+.legal h2 { font-size: 1.15rem; margin-top: 18px; }
+.legal ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.legal p, .legal li { color: var(--muted); }
+.legal b { color: var(--ink); }
+.legal-note { text-align: center; margin-top: 10px; }

@@ -108,6 +108,7 @@
     const config = {
       ...draft.config,
       vat: Math.min(0.5, num(draft.config.vat)),
+      company: (() => { const c = draft.config.company || {}; return { name: str(c.name, 120) || 'FUNDICAT SL', nif: str(c.nif, 20).toUpperCase().replace(/s+/g, ''), address: str(c.address, 200), registry: str(c.registry, 200), email: str(c.email, 120), phone: str(c.phone, 30) }; })(),
       shipping: {
         autoLabel: !!s.autoLabel,
         pickup: { enabled: !!s.pickup?.enabled, address: str(s.pickup?.address, 200) || 'Manresa (Barcelona)' },
