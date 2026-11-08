@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Símbol Fundicat: flascó de motlle amb una F feta de canals de colada. Monocrom. -->
+  <rect x="5" y="5" width="54" height="54" rx="8" fill="none" stroke="#1d1d1f" stroke-width="5"/>
+  <path d="M15 13h20l-6 8h-8z" fill="#1d1d1f"/>
+  <path d="M21 24h26v7H28v5h13v7H28v9h-7z" fill="#1d1d1f"/>
+</svg>

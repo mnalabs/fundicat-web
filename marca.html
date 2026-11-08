@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="ca">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fundicat · Marca</title>
+  <link rel="icon" href="marca/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .bm-hero { text-align: center; padding-block: 120px 96px; }
+    .bm-hero .mark { display: inline-flex; align-items: center; gap: 22px; margin-bottom: 28px; }
+    .bm-hero .mark svg { width: 72px; height: 72px; }
+    .bm-hero .mark span { font-size: 2.6rem; font-weight: 600; letter-spacing: .26em; }
+    .bm-nav { display: flex; justify-content: center; flex-wrap: wrap; gap: 28px; margin-top: 32px; font-size: .9rem; }
+    .bm-nav a { color: var(--link); }
+    .bm-nav a:hover { text-decoration: underline; }
+    .bm-sec { padding-block: 96px; border-top: 1px solid var(--line); }
+    .bm-sec h2 { font-size: clamp(1.8rem, 3.4vw, 2.6rem); }
+    .bm-sec .intro { color: var(--muted); font-size: 1.15rem; max-width: 640px; margin: 14px 0 48px; }
+    .tiles-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .bt { background: var(--alt); border-radius: var(--r); min-height: 240px; display: grid; place-items: center; position: relative; padding: 32px; }
+    .bt small { position: absolute; left: 20px; bottom: 16px; color: var(--muted); font-size: .78rem; }
+    .bt.dark { background: #1d1d1f; color: #f5f5f7; }
+    .bt.dark small { color: #a1a1a6; }
+    .bt.white { background: #fff; border: 1px solid var(--line); color: #1d1d1f; }
+    .lockup { display: flex; align-items: center; gap: 14px; font-size: 1.5rem; font-weight: 600; letter-spacing: .26em; }
+    .lockup svg { width: 40px; height: 40px; }
+    .anatomy { display: grid; grid-template-columns: 260px 1fr; gap: 64px; align-items: center; }
+    .anatomy ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 20px; }
+    .anatomy li b { display: block; font-weight: 600; }
+    .anatomy li span { color: var(--muted); }
+    .colors { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+    .c { border-radius: var(--r); overflow: hidden; border: 1px solid var(--line); }
+    .c i { display: block; height: 140px; }
+    .c div { padding: 14px 16px; font-size: .88rem; display: grid; gap: 2px; }
+    .c b { font-weight: 600; font-size: 1rem; }
+    .c code { font-family: var(--mono); color: var(--muted); font-size: .8rem; }
+    .type-row { display: grid; grid-template-columns: 200px 1fr; gap: 32px; padding: 28px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+    .type-row > span { color: var(--muted); font-size: .82rem; line-height: 1.6; }
+    .voice { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .voice div { background: var(--alt); border-radius: var(--r); padding: 28px; }
+    .voice h3 { margin-bottom: 12px; }
+    .voice ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; color: var(--muted); }
+    .pairs { display: grid; gap: 10px; margin-top: 24px; }
+    .pairs div { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .pairs p { padding: 16px 18px; border-radius: var(--r-sm); border: 1px solid var(--line); font-size: .95rem; }
+    .pairs p::before { display: block; font-size: .72rem; margin-bottom: 4px; }
+    .pairs .yes::before { content: 'Sí'; color: var(--ok); }
+    .pairs .no { color: var(--muted); }
+    .pairs .no::before { content: 'No'; color: var(--warn); }
+    .apps { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .app { background: var(--alt); border-radius: var(--r); overflow: hidden; }
+    .app svg { width: 100%; aspect-ratio: 4 / 3; display: block; }
+    .app p { padding: 0 24px 22px; color: var(--muted); font-size: .92rem; }
+    .app p b { color: var(--ink); font-weight: 600; }
+    .donts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .dont { background: var(--alt); border-radius: var(--r); padding: 28px 16px 20px; text-align: center; font-size: .85rem; color: var(--muted); display: grid; gap: 16px; justify-items: center; }
+    .dont .demo { height: 56px; display: grid; place-items: center; }
+    @media (max-width: 900px) {
+      .tiles-3, .apps, .voice, .anatomy, .type-row { grid-template-columns: 1fr; }
+      .colors { grid-template-columns: 1fr 1fr; }
+      .donts { grid-template-columns: 1fr 1fr; }
+      .pairs div { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="fc" viewBox="0 0 64 64">
+      <rect x="5" y="5" width="54" height="54" rx="8" fill="none" stroke="currentColor" stroke-width="5"/>
+      <path d="M15 13h20l-6 8h-8z" fill="currentColor"/>
+      <path d="M21 24h26v7H28v5h13v7H28v9h-7z" fill="currentColor"/>
+    </symbol>
+  </svg>
+
+  <header class="site-header">
+    <div class="wrap header-row">
+      <a href="index.html" class="logo"><svg viewBox="0 0 64 64"><use href="#fc"/></svg><span>FUNDICAT</span></a>
+      <nav class="main-nav" aria-label="Marca" style="margin-left:auto;margin-right:0"><a href="index.html">Botiga</a></nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="bm-hero wrap">
+      <div class="mark"><svg><use href="#fc"/></svg><span>FUNDICAT</span></div>
+      <h1>Marca</h1>
+      <p class="lead" style="margin-top:12px">Normes d'ús del logotip, el color, la tipografia i el to de Fundicat.</p>
+      <nav class="bm-nav" aria-label="Seccions">
+        <a href="#logo">Logotip</a><a href="#color">Color</a><a href="#tipo">Tipografia</a><a href="#veu">To</a><a href="#aplicacions">Aplicacions</a><a href="#usos">Usos incorrectes</a>
+      </nav>
+    </section>
+
+    <section class="bm-sec" id="logo">
+      <div class="wrap">
+        <h2>Logotip</h2>
+        <p class="intro">Un símbol i un nom, sempre en un sol color. El símbol és la secció d'un motlle de fosa: l'embut per on entra el metall i els canals que formen la F, dins del flascó.</p>
+        <div class="tiles-3">
+          <div class="bt white"><div class="lockup"><svg><use href="#fc"/></svg>FUNDICAT</div><small>Principal, sobre blanc</small></div>
+          <div class="bt dark"><div class="lockup"><svg><use href="#fc"/></svg>FUNDICAT</div><small>Negatiu, sobre grafit</small></div>
+          <div class="bt"><div style="display:flex;gap:20px;align-items:end"><img src="marca/favicon.svg" width="72" height="72" alt="Icona d'app"><svg width="40" height="40"><use href="#fc"/></svg><svg width="20" height="20"><use href="#fc"/></svg></div><small>Icona, 40 i 20 px</small></div>
+        </div>
+        <div class="anatomy" style="margin-top:64px">
+          <svg viewBox="0 0 64 64" style="width:100%;max-width:260px;color:var(--ink)"><use href="#fc"/></svg>
+          <ol>
+            <li><b>Embut</b><span>Per on entra el metall fos.</span></li>
+            <li><b>Bebedor i conductes</b><span>Els canals del motlle formen la F de Fundicat.</span></li>
+            <li><b>Flascó</b><span>La caixa del motlle, amb cantonades arrodonides com una peça mecanitzada.</span></li>
+            <li><b>Nom</b><span>En majúscules, pes semibold i espaiat ampli (0,26 em). Ha de mesurar com a mínim 100 px d'ample.</span></li>
+          </ol>
+        </div>
+        <p class="small muted" style="margin-top:32px">Fitxers: <a class="link" href="marca/logo.svg">logo.svg</a> &nbsp; <a class="link" href="marca/simbol.svg">simbol.svg</a> &nbsp; <a class="link" href="marca/favicon.svg">favicon.svg</a></p>
+      </div>
+    </section>
+
+    <section class="bm-sec" id="color">
+      <div class="wrap">
+        <h2>Color</h2>
+        <p class="intro">Una paleta neutra perquè el producte sigui el protagonista. El negre grafit s'usa per a les accions i el verd només per als enllaços.</p>
+        <div class="colors">
+          <div class="c"><i style="background:#fff"></i><div><b>Blanc</b><code>#FFFFFF</code><span class="muted">Fons</span></div></div>
+          <div class="c"><i style="background:#f5f5f7"></i><div><b>Gris clar</b><code>#F5F5F7</code><span class="muted">Seccions, fons de producte</span></div></div>
+          <div class="c"><i style="background:#1d1d1f"></i><div><b>Grafit</b><code>#1D1D1F</code><span class="muted">Text, logotip, botons</span></div></div>
+          <div class="c"><i style="background:#6e6e73"></i><div><b>Gris</b><code>#6E6E73</code><span class="muted">Text secundari</span></div></div>
+          <div class="c"><i style="background:#0a6b52"></i><div><b>Verd</b><code>#0A6B52</code><span class="muted">Enllaços</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bm-sec" id="tipo">
+      <div class="wrap">
+        <h2>Tipografia</h2>
+        <p class="intro">La font del sistema de cada dispositiu: SF Pro a Apple i Segoe UI a Windows. Es carrega a l'instant, es llegeix bé i no cal pagar llicències.</p>
+        <div class="type-row"><span>Titular<br>Semibold · 48–72 px</span><span style="font-size:clamp(2.4rem,5vw,4rem);font-weight:600;letter-spacing:-.025em;line-height:1.05">PetroBond</span></div>
+        <div class="type-row"><span>Subtítol<br>Regular · 21–24 px · gris</span><span style="font-size:1.4rem;color:var(--muted)">Sorra de fosa aglutinada amb oli.</span></div>
+        <div class="type-row"><span>Text<br>Regular · 17 px</span><span>Tamisa-la, compacta-la i torna-la a fer servir. No s'ha d'humitejar.</span></div>
+        <div class="type-row"><span>Logotip<br>Semibold · majúscules · 0,26 em</span><span style="font-weight:600;letter-spacing:.26em">FUNDICAT</span></div>
+      </div>
+    </section>
+
+    <section class="bm-sec" id="veu">
+      <div class="wrap">
+        <h2>To</h2>
+        <p class="intro">Frases curtes i concretes. Dades reals en lloc d'adjectius.</p>
+        <div class="voice">
+          <div><h3>Som</h3><ul><li>Clars: una idea per frase</li><li>Concrets: pesos, mides, terminis</li><li>Propers: tractem de tu</li><li>Discrets: sense signes d'exclamació</li></ul></div>
+          <div><h3>Evitem</h3><ul><li>Superlatius ("el millor", "premium")</li><li>Urgències falses i ofertes cridaneres</li><li>Paraules buides ("solucions innovadores")</li><li>Majúscules per cridar</li></ul></div>
+        </div>
+        <div class="pairs">
+          <div><p class="yes">Surt en 24–48 h des de Manresa.</p><p class="no">Enviament ultraràpid garantit!</p></div>
+          <div><p class="yes">Del plànol a la peça en una setmana.</p><p class="no">Solucions integrals de mecanitzat d'alta qualitat.</p></div>
+          <div><p class="yes">PetroBond, 5 kg</p><p class="no">ARENA PREMIUM PROFESIONAL FUNDICIÓN JOYERÍA</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bm-sec" id="aplicacions">
+      <div class="wrap">
+        <h2>Aplicacions</h2>
+        <p class="intro">Embalatge kraft amb una etiqueta blanca i el logotip en negre. No hi afegim res més.</p>
+        <div class="apps">
+          <figure class="app" style="margin:0">
+            <svg viewBox="0 0 320 240" role="img" aria-label="Sac de PetroBond">
+              <ellipse cx="160" cy="214" rx="64" ry="5" fill="#000" opacity=".07"/>
+              <path d="M118 36h84l12 170a6 6 0 0 1-6 6H112a6 6 0 0 1-6-6z" fill="#cbb898"/><path d="M118 36h84l-6 16h-72z" fill="#b19d7c"/>
+              <rect x="126" y="92" width="68" height="60" rx="2" fill="#fff"/>
+              <g transform="translate(152 99) scale(.25)" style="color:#1d1d1f"><use href="#fc" width="64" height="64"/></g>
+              <text x="160" y="132" text-anchor="middle" fill="#1d1d1f" font-family="-apple-system,Segoe UI,sans-serif" font-weight="600" font-size="12">PetroBond</text>
+              <text x="160" y="144" text-anchor="middle" fill="#6e6e73" font-family="-apple-system,Segoe UI,sans-serif" font-size="8">5 kg</text>
+            </svg>
+            <p><b>Sac.</b> Etiqueta blanca centrada, amb el símbol, el nom del producte i el pes.</p>
+          </figure>
+          <figure class="app" style="margin:0">
+            <svg viewBox="0 0 320 240" role="img" aria-label="Targeta de visita">
+              <g transform="rotate(-3 110 120)"><rect x="34" y="74" width="168" height="98" rx="4" fill="#1d1d1f"/><g transform="translate(104 98) scale(.44)" style="color:#f5f5f7"><use href="#fc" width="64" height="64"/></g><text x="118" y="152" text-anchor="middle" fill="#f5f5f7" font-family="-apple-system,Segoe UI,sans-serif" font-weight="600" font-size="9" letter-spacing="2.4">FUNDICAT</text></g>
+              <g transform="rotate(2 230 130)"><rect x="140" y="90" width="168" height="98" rx="4" fill="#fff" stroke="#d2d2d7"/><text x="156" y="118" fill="#1d1d1f" font-family="-apple-system,Segoe UI,sans-serif" font-weight="600" font-size="11">Fundicat SL</text><text x="156" y="132" fill="#6e6e73" font-family="-apple-system,Segoe UI,sans-serif" font-size="8">Material de fosa i mecanitzat</text><text x="156" y="162" fill="#1d1d1f" font-family="-apple-system,Segoe UI,sans-serif" font-size="8">623 008 521</text><text x="156" y="174" fill="#1d1d1f" font-family="-apple-system,Segoe UI,sans-serif" font-size="8">Manresa, Barcelona</text></g>
+            </svg>
+            <p><b>Targeta de visita.</b> Una cara en grafit amb el logotip i l'altra en blanc amb les dades.</p>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="bm-sec" id="usos">
+      <div class="wrap">
+        <h2>Usos incorrectes</h2>
+        <p class="intro">El logotip no es modifica.</p>
+        <div class="donts">
+          <div class="dont"><div class="demo"><svg width="56" height="40" style="transform:scaleX(1.6)"><use href="#fc"/></svg></div>No el deformis</div>
+          <div class="dont"><div class="demo" style="color:#d4145a"><svg width="44" height="44"><use href="#fc"/></svg></div>No el pintis de colors</div>
+          <div class="dont"><div class="demo"><svg width="44" height="44" style="filter:drop-shadow(3px 3px 3px rgba(0,0,0,.5))"><use href="#fc"/></svg></div>No hi afegeixis efectes</div>
+          <div class="dont"><div class="demo"><svg width="44" height="44" style="transform:rotate(15deg)"><use href="#fc"/></svg></div>No el giris</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-legal" style="border-top:0;padding-top:0"><span>Copyright © 2026 Fundicat SL.</span><a href="index.html">Botiga</a></div>
+  </footer>
+</body>
+</html>

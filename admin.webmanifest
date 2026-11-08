@@ -1,0 +1,22 @@
+{
+  "name": "Fundicat · Panell",
+  "short_name": "Fundicat Panell",
+  "description": "Comandes, pressupostos i botiga de Fundicat.",
+  "lang": "ca",
+  "id": "/admin.html",
+  "start_url": "/admin.html#/comandes",
+  "scope": "/admin",
+  "display": "standalone",
+  "background_color": "#f5f5f7",
+  "theme_color": "#ffffff",
+  "categories": ["business", "productivity"],
+  "icons": [
+    { "src": "/marca/admin-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/marca/admin-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/marca/admin-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Per preparar", "url": "/admin.html#/comandes", "icons": [{ "src": "/marca/admin-192.png", "sizes": "192x192" }] },
+    { "name": "Pressupostos", "url": "/admin.html#/pressupostos", "icons": [{ "src": "/marca/admin-192.png", "sizes": "192x192" }] }
+  ]
+}

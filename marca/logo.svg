@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 64" width="340" height="64">
+  <!-- Logotip horitzontal. Text en la font del sistema (SF Pro / Segoe UI), pes 600, espaiat 0,26 em.
+       Per a impremta, convertir el text a traços. -->
+  <rect x="5" y="5" width="54" height="54" rx="8" fill="none" stroke="#1d1d1f" stroke-width="5"/>
+  <path d="M15 13h20l-6 8h-8z" fill="#1d1d1f"/>
+  <path d="M21 24h26v7H28v5h13v7H28v9h-7z" fill="#1d1d1f"/>
+  <text x="82" y="44" fill="#1d1d1f" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', Helvetica, Arial, sans-serif" font-weight="600" font-size="30" letter-spacing="7.8">FUNDICAT</text>
+</svg>

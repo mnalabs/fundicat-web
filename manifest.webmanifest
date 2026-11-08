@@ -1,0 +1,23 @@
+{
+  "name": "Fundicat",
+  "short_name": "Fundicat",
+  "description": "Material de fosa, equips i serveis industrials. Des de Manresa.",
+  "lang": "ca",
+  "id": "/",
+  "start_url": "/?app=1#/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "categories": ["shopping", "business"],
+  "icons": [
+    { "src": "/marca/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/marca/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/marca/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Botiga", "url": "/#/botiga", "icons": [{ "src": "/marca/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Demana pressupost", "url": "/#/contacte#pressupost", "icons": [{ "src": "/marca/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Cistella", "url": "/#/cistella", "icons": [{ "src": "/marca/icon-192.png", "sizes": "192x192" }] }
+  ]
+}
