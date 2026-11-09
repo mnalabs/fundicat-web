@@ -425,6 +425,15 @@
     ['Propà', 'Propano', 'Propane', 'Propano'],
     ['Refractari', 'Refractario', 'Refractory', 'Refrattario'],
     ['Exterior', 'Exterior', 'Outdoors', 'Esterno'],
+    // Cancel·lació
+    ['T\'hem retornat {amount} a la targeta. El banc pot trigar entre 5 i 10 dies laborables a mostrar-ho.', 'Te hemos devuelto {amount} a la tarjeta. El banco puede tardar entre 5 y 10 días laborables en mostrarlo.', 'We have refunded {amount} to your card. Your bank may take 5 to 10 working days to show it.', 'Ti abbiamo rimborsato {amount} sulla carta. La banca può impiegare da 5 a 10 giorni lavorativi per mostrarlo.'],
+    ['Vols cancel·lar la comanda?', '¿Quieres cancelar el pedido?', 'Want to cancel the order?', 'Vuoi annullare l\'ordine?'],
+    ['Encara no l\'has pagat: es cancel·la sense cap cost.', 'Aún no lo has pagado: se cancela sin ningún coste.', 'You haven\'t paid yet: it is cancelled at no cost.', 'Non l\'hai ancora pagato: viene annullato senza alcun costo.'],
+    ['Pots cancel·lar-la fins al {date}, mentre no hagi sortit del taller. Et retornem tot l\'import a la mateixa targeta.', 'Puedes cancelarlo hasta el {date}, mientras no haya salido del taller. Te devolvemos todo el importe a la misma tarjeta.', 'You can cancel it until {date}, as long as it hasn\'t left our workshop. We refund the full amount to the same card.', 'Puoi annullarlo fino al {date}, finché non è uscito dall\'officina. Ti rimborsiamo l\'intero importo sulla stessa carta.'],
+    ['Cancel·la la comanda', 'Cancelar el pedido', 'Cancel order', 'Annulla l\'ordine'],
+    ['Cancel·lant…', 'Cancelando…', 'Cancelling…', 'Annullamento…'],
+    ['Segur que vols cancel·lar la comanda {n}? No es pot desfer.', '¿Seguro que quieres cancelar el pedido {n}? No se puede deshacer.', 'Are you sure you want to cancel order {n}? This cannot be undone.', 'Sei sicuro di voler annullare l\'ordine {n}? Non si può annullare.'],
+    ['Si te n\'penedeixes, pots cancel·lar-la des de <a href="#/seguiment">Seguiment</a> mentre no hagi sortit del taller.', 'Si cambias de opinión, puedes cancelarlo desde <a href="#/seguiment">Seguimiento</a> mientras no haya salido del taller.', 'If you change your mind, you can cancel it from <a href="#/seguiment">Tracking</a> as long as it hasn\'t left our workshop.', 'Se cambi idea, puoi annullarlo da <a href="#/seguiment">Tracciamento</a> finché non è uscito dall\'officina.'],
   ];
 
   // Contingut del catàleg (camps que no són especificacions).

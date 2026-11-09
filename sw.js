@@ -1,7 +1,7 @@
 // Service worker de la botiga: fa que s'obri ràpid des de la pantalla d'inici
 // i que es pugui consultar sense connexió (amb l'últim catàleg descarregat).
 // El panell d'administració i l'API privada no es desen mai a la memòria cau.
-const CACHE = 'fundicat-v15';
+const CACHE = 'fundicat-v16';
 const SHELL = [
   '/', '/css/styles.css', '/js/i18n.js', '/js/config.js', '/js/boot.js', '/js/shipping.js', '/js/legal.js', '/js/store.js', '/js/app.js',
   '/manifest.webmanifest', '/marca/favicon.svg', '/marca/icon-192.png', '/marca/icon-512.png',

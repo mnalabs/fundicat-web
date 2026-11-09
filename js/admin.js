@@ -205,6 +205,7 @@
   function fillShipDefaults() {
     draft.config.company = { name: "FUNDICAT SL", nif: "", address: "", registry: "", email: "fundicatsl@gmail.com", phone: "623 008 521", ...(draft.config.company || {}) };
     const s = draft.config.shipping || (draft.config.shipping = {});
+    draft.config.cancel = { hours: 24, ...(draft.config.cancel || {}) };
     s.packlink = { enabled: false, marginPct: 0, marginFixed: 0, addVat: false, ...(s.packlink || {}) };
     s.packlink.box = { l: 30, w: 20, h: 15, ...(s.packlink.box || {}) };
     const SH = window.FundicatShipping;
@@ -910,6 +911,8 @@
                 ${statusSelect(o).replace('<select', '<select class="inline-input"')}
                 <p class="muted small">Pagament: ${esc({ card: 'Targeta (Stripe)', bizum: 'Bizum', transfer: 'Transferència' }[o.method] || o.method)}${o.payment?.paidAt ? ` · cobrat el ${fmtDate(o.payment.paidAt)}` : ''}${o.payment?.paymentIntent ? ` · <a href="https://dashboard.stripe.com/payments/${esc(o.payment.paymentIntent)}" target="_blank" rel="noopener">veure a Stripe</a>` : ''}</p>
                 ${o.status === 'nova' ? `<p class="muted small">${o.method === 'transfer' ? PAID_HELP.transfer : PAID_HELP.card}</p><button type="button" class="btn" data-paid="${esc(o.number)}">Marca com a pagada</button>` : ''}
+                ${o.status === 'cancel·lada' ? `<p class="muted small">Cancel·lada${o.cancelledAt ? ` el ${fmtDate(o.cancelledAt)}` : ''}${o.cancelBy ? ` pel ${esc(o.cancelBy)}` : ''}.${o.refund?.amount ? ` Reemborsats ${eur(o.refund.amount)} al client.` : ''}${o.refund?.manual ? ' <b>Cal tornar els diners al client a mà</b> (no es va pagar amb targeta).' : ''}</p>` : ''}
+                ${['nova', 'pagada'].includes(o.status) ? `<hr style="border:0;border-top:1px solid var(--line);margin:12px 0"><p class="muted small">${o.status === 'nova' ? 'Encara no està pagada: es cancel·la sense cap cost.' : o.method === 'card' && o.payment?.paymentIntent ? 'Reemborsa tot l\'import al client a Stripe i torna l\'estoc.' : 'No es va cobrar amb targeta: hauràs de tornar els diners a mà. L\'estoc es retorna.'}${o.label ? ' <b>Ja té etiqueta: avisa el transportista si ja l\'havies creat.</b>' : ''}</p><button type="button" class="btn btn-ghost" data-cancel-order="${esc(o.number)}">Cancel·la la comanda</button>` : ''}
               </section>
               <section class="card">
                 <h2>Enviament</h2>
@@ -1028,6 +1031,17 @@
         toast(`${o.number}: pagada. Ja és a "Per preparar".`);
         render();
       } catch (err) { handle(err); b.disabled = false; }
+    }));
+    $$('[data-cancel-order]').forEach((b) => b.addEventListener('click', async () => {
+      const n = b.dataset.cancelOrder;
+      if (!confirm(`Cancel·lar la comanda ${n}? Si ja estava cobrada amb targeta, es reemborsarà tot l'import al client. No es pot desfer.`)) return;
+      b.disabled = true; b.textContent = 'Cancel·lant…';
+      try {
+        const r = await BE.cancelOrder(n);
+        orders = r.orders;
+        toast(r.manual ? `${n}: cancel·lada. Recorda tornar els diners al client.` : r.refunded ? `${n}: cancel·lada i reemborsats ${eur(r.refunded)}.` : `${n}: cancel·lada.`);
+        render();
+      } catch (err) { handle(err); b.disabled = false; b.textContent = 'Cancel·la la comanda'; }
     }));
     $$('[data-ofilter]').forEach((b) => b.addEventListener('click', () => { ui.orderFilter = b.dataset.ofilter; render(); }));
     $$('[data-label]').forEach((b) => b.addEventListener('click', () => { b.disabled = true; createLabels([b.dataset.label]); }));
@@ -1243,6 +1257,17 @@
           <label class="field"><span>Alt</span><div class="prefix" data-suffix="cm"><input data-f="config.shipping.packlink.box.h" data-type="number" type="number" min="1" max="300" step="0.5"></div></label>
         </div>
       </section>
+      <section class="card" data-sec="cfg:enviaments">
+        <h2>Preus dels transportistes</h2>
+        <p class="muted small">Consulta ara mateix què cobra cada transportista per portar un paquet a un destí. Serveix per comprovar els marges, veure si el preu porta IVA i saber quin és el més barat o el més ràpid.</p>
+        ${BE.packlink ? `<form id="pl-form" class="row" style="grid-template-columns:repeat(auto-fit,minmax(110px,1fr));align-items:end" novalidate>
+          <label class="field"><span>País</span><select name="country" class="inline-input">${['Espanya', 'Portugal', 'Itàlia', 'França', 'Alemanya'].map((c) => `<option>${c}</option>`).join('')}</select></label>
+          <label class="field"><span>Codi postal</span><input name="zip" class="inline-input" value="08001" maxlength="10"></label>
+          <label class="field"><span>Pes (kg)</span><input name="kg" class="inline-input" type="number" min="0.1" max="70" step="0.1" value="5.2"></label>
+          <label class="field"><span>Mides (cm)</span><input name="dims" class="inline-input" value="${esc(`${draft.config.shipping.packlink.box.l}x${draft.config.shipping.packlink.box.w}x${draft.config.shipping.packlink.box.h}`)}" placeholder="26x17x12"></label>
+          <button class="btn" type="submit">Consulta els preus</button>
+        </form><div id="pl-result" aria-live="polite" style="margin-top:12px"></div>` : '<p class="muted small">Cal connectar Packlink abans (clau <code>PACKLINK_API_KEY</code> a Supabase).</p>'}
+      </section>
       <section class="card card-flush" data-sec="cfg:enviaments">
         <div class="toolbar"><h2 style="flex:1">Dies d'entrega</h2><span class="muted small">Dies laborables (dilluns a divendres)</span></div>
         <div style="padding:12px 16px;display:grid;gap:12px">
@@ -1298,6 +1323,11 @@
         </div>
       </section>
       <section class="card" data-sec="cfg:pagaments">
+        <h2>Cancel·lacions</h2>
+        <p class="muted small">El client pot cancel·lar ell mateix des de la pàgina de Seguiment, amb un botó, mentre la comanda no tingui etiqueta ni hagi sortit, i dins d'aquest termini després de pagar. Si ho fa, es reemborsa tot l'import a la targeta i et surt un avís al mòbil. Tu pots cancel·lar qualsevol comanda no enviada des de la fitxa de la comanda.</p>
+        <label class="field" style="max-width:260px"><span>Termini per cancel·lar després de pagar</span><div class="prefix" data-suffix="hores"><input data-f="config.cancel.hours" data-type="number" type="number" min="1" max="720" step="1"></div><small>24 = un dia. Les comandes sense pagar sempre es poden cancel·lar.</small></label>
+      </section>
+      <section class="card" data-sec="cfg:pagaments">
         <h2>Impostos</h2>
         <label class="field" style="max-width:220px"><span>IVA</span><div class="prefix" data-suffix="%"><input data-f="config.vat" data-type="percent" type="number" min="0" max="50" step="0.5"></div><small>Els preus del catàleg ja l'inclouen.</small></label>
       </section>
@@ -1307,6 +1337,20 @@
     bindFields($('#main'), draft);
     bindSecTabs($('#main'));
     paintPush();
+    $('#pl-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const f = e.target; const out = $('#pl-result'); const btn = $('button', f);
+      const [l, w, h] = f.dims.value.split(/[x×*; ]+/).map(Number);
+      btn.disabled = true; out.innerHTML = '<p class="muted">Consultant Packlink…</p>';
+      try {
+        const r = await BE.packlinkPrices({ country: f.country.value, zip: f.zip.value, kg: Number(f.kg.value), l, w, h });
+        const m = r.margin;
+        const rows = r.services.map((s, i) => `<tr style="cursor:default"><td>${esc(s.carrier)}${i === 0 ? ' <span class="badge badge-ok">Més barat</span>' : ''}</td><td>${esc(s.name)}</td><td>${s.hours ? (s.hours < 48 ? `${s.hours} h` : `${Math.round(s.hours / 24)} dies`) : esc(s.time) || '—'}</td><td>${eur(s.total)}${s.base ? `<br><span class="muted small">${eur(s.base)} + IVA ${eur(s.tax)}</span>` : ''}</td><td><b>${eur(s.client)}</b></td></tr>`).join('');
+        out.innerHTML = r.services.length ? `<div style="overflow-x:auto"><table class="list"><thead><tr><th>Transportista</th><th>Servei</th><th>Trànsit</th><th>Cobra Packlink</th><th>Pagaria el client</th></tr></thead><tbody>${rows}</tbody></table></div>
+          <p class="muted small">Paquet de ${r.parcel.kg} kg i ${r.parcel.length}×${r.parcel.width}×${r.parcel.height} cm. Marge actual: ${m.pct}% + ${eur(m.fixed)}${m.addVat ? ' i IVA afegit' : ''}. «Pagaria el client» és el que veuria al pagament. La botiga només ensenya els 6 més barats.</p>` : '<p class="muted">Cap transportista disponible per a aquest destí i paquet.</p>';
+      } catch (err) { out.innerHTML = ''; handle(err); }
+      btn.disabled = false;
+    });
     $('#install-btn')?.addEventListener('click', async () => {
       if (!installPrompt) return;
       installPrompt.prompt();

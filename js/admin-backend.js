@@ -108,7 +108,8 @@
     const config = {
       ...draft.config,
       vat: Math.min(0.5, num(draft.config.vat)),
-      company: (() => { const c = draft.config.company || {}; return { name: str(c.name, 120) || 'FUNDICAT SL', nif: str(c.nif, 20).toUpperCase().replace(/s+/g, ''), address: str(c.address, 200), registry: str(c.registry, 200), email: str(c.email, 120), phone: str(c.phone, 30) }; })(),
+      cancel: { hours: Math.min(720, Math.max(1, Math.round(Number(draft.config.cancel?.hours)) || 24)) },
+      company: (() => { const c = draft.config.company || {}; return { name: str(c.name, 120) || 'FUNDICAT SL', nif: str(c.nif, 20).toUpperCase().replace(/\s+/g, ''), address: str(c.address, 200), registry: str(c.registry, 200), email: str(c.email, 120), phone: str(c.phone, 30) }; })(),
       shipping: {
         autoLabel: !!s.autoLabel,
         pickup: { enabled: !!s.pickup?.enabled, address: str(s.pickup?.address, 200) || 'Manresa (Barcelona)' },
@@ -183,7 +184,7 @@
       number: o.number, date: o.created_at, status: o.status, method: o.method, customer: o.customer, lines: o.lines,
       subtotal: +o.subtotal, shipping: +o.shipping, total: +o.total, vat: +o.vat, delivery: o.delivery,
       label: o.label || undefined, labelError: o.label_error || undefined, carrierStatus: o.carrier_status || undefined,
-      payment: o.payment || undefined, shippedAt: o.shipped_at || undefined, deliveredAt: o.delivered_at || undefined,
+      payment: o.payment || undefined, cancelledAt: o.cancelled_at || undefined, cancelBy: o.cancel_by || undefined, refund: o.refund || undefined, shippedAt: o.shipped_at || undefined, deliveredAt: o.delivered_at || undefined,
     });
     const mapQuote = (q) => ({ ...q, date: q.created_at });
 
@@ -322,6 +323,22 @@
         const [o] = await rest(`orders?number=eq.${encodeURIComponent(number)}`, { method: 'PATCH', body: { status }, prefer: 'return=representation' });
         return mapOrder(o);
       },
+      // Cancel·la la comanda i, si és de targeta ja cobrada, la reemborsa a Stripe (funció "botiga").
+      async cancelOrder(number) {
+        const res = await fn('cancel', { method: 'POST', body: { number } });
+        if (res.status === 401) throw authError();
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || 'No s\'ha pogut cancel·lar la comanda.');
+        return { ...data, orders: await loadOrders() };
+      },
+      // Tots els preus que ofereixen ara els transportistes (Packlink) per a un destí i un paquet.
+      async packlinkPrices(query) {
+        const res = await fn('packlink-prices', { method: 'POST', body: query });
+        if (res.status === 401) throw authError();
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || 'No s\'han pogut consultar els preus.');
+        return data;
+      },
       async setQuoteStatus(ref, status) {
         const [q] = await rest(`quotes?ref=eq.${encodeURIComponent(ref)}`, { method: 'PATCH', body: { status }, prefer: 'return=representation' });
         return mapQuote(q);
@@ -432,6 +449,8 @@
         if (!res.ok) throw new Error(data.error || 'No s\'ha pogut pujar la imatge.');
         return data.url;
       },
+      cancelOrder: () => Promise.reject(new Error('Cancel·lar amb reemborsament només funciona amb Supabase.')),
+      packlinkPrices: () => Promise.reject(new Error('Només funciona amb Supabase.')),
       setOrderStatus: (number, status) => api(`/api/admin/orders/${encodeURIComponent(number)}`, { method: 'PATCH', body: { status } }),
       markPaid: (number) => api(`/api/admin/orders/${encodeURIComponent(number)}`, { method: 'PATCH', body: { status: 'pagada' } }),
       stripe: false,

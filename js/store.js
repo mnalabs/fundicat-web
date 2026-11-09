@@ -213,6 +213,18 @@
       if (!res.ok) throw new Error('No s\'ha pogut consultar la comanda. Torna-ho a provar d\'aquí a una estona.');
       return data; // null si no coincideix
     },
+    // Cancel·la la comanda (només amb número + correu). La funció comprova el termini i reemborsa.
+    async cancel(number, email) {
+      if (BACKEND.type !== 'supabase') throw new Error('No disponible en aquesta versió.');
+      const res = await fetch(`${BACKEND.url}/functions/v1/botiga/cancel`, {
+        method: 'POST',
+        headers: { apikey: BACKEND.key, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ number, email }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'No s\'ha pogut cancel·lar. Escriu-nos a fundicatsl@gmail.com.');
+      return data;
+    },
   };
 
   const quotes = {

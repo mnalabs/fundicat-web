@@ -631,3 +631,8 @@ a.contact-card b { color: var(--link); }
 .legal p, .legal li { color: var(--muted); }
 .legal b { color: var(--ink); }
 .legal-note { text-align: center; margin-top: 10px; }
+
+/* Cancel·lació de la comanda (Seguiment) */
+.track-cancel { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
+.track-cancel h3 { margin: 0 0 6px; font-size: 1rem; }
+.track-cancel .btn { margin-top: 8px; }

@@ -65,6 +65,8 @@
         <ul><li><b>Targeta:</b> el pagament es fa a la pàgina segura de Stripe. La comanda queda confirmada en el moment.</li><li><b>Transferència:</b> us donem el compte bancari. Preparem la comanda quan rebem l'import.</li></ul>
         <h2>Enviament i entrega</h2>
         <p>Enviem a la Península i a les zones que es mostren al pagament. Els dies d'entrega que indiquem són una estimació en dies laborables des que la comanda surt del taller. Podeu consultar l'estat a la pàgina de seguiment amb el número de comanda i el correu.</p>
+        <h2>Cancel·lació de la comanda</h2>
+        <p>Podeu cancel·lar la comanda vosaltres mateixos des de la pàgina de Seguiment, amb el número de comanda i el correu, mentre no hagi sortit del taller i dins del termini que s'indica a la mateixa pàgina. Us tornem tot l'import a la mateixa targeta amb què heu pagat.</p>
         <h2>Dret de desistiment</h2>
         <p>Si compreu com a consumidor, teniu 14 dies naturals des que rebeu el paquet per tornar-lo sense donar explicacions. Escriviu-nos a <a href="mailto:${d.email}">${d.email}</a> indicant el número de comanda. El producte ha de tornar en bon estat i en el seu embalatge. El cost de la devolució va a càrrec vostre, llevat que el producte sigui defectuós o erroni. Us retornarem l'import, inclòs l'enviament inicial estàndard, en un màxim de 14 dies des que rebem el producte, pel mateix mitjà de pagament.</p>
         <p>No hi ha dret de desistiment en les peces fabricades a mida o per encàrrec, ni en les compres fetes per empreses o professionals.</p>
@@ -121,6 +123,8 @@
         <ul><li><b>Tarjeta:</b> el pago se hace en la página segura de Stripe. El pedido queda confirmado en el momento.</li><li><b>Transferencia:</b> le damos la cuenta bancaria. Preparamos el pedido cuando recibimos el importe.</li></ul>
         <h2>Envío y entrega</h2>
         <p>Enviamos a la Península y a las zonas que se muestran al pagar. Los días de entrega que indicamos son una estimación en días laborables desde que el pedido sale del taller. Puede consultar el estado en la página de seguimiento con el número de pedido y el correo.</p>
+        <h2>Cancelación del pedido</h2>
+        <p>Puede cancelar el pedido usted mismo desde la página de Seguimiento, con el número de pedido y el correo, mientras no haya salido del taller y dentro del plazo que se indica en la misma página. Le devolvemos todo el importe a la misma tarjeta con la que ha pagado.</p>
         <h2>Derecho de desistimiento</h2>
         <p>Si compra como consumidor, tiene 14 días naturales desde que recibe el paquete para devolverlo sin dar explicaciones. Escríbanos a <a href="mailto:${d.email}">${d.email}</a> indicando el número de pedido. El producto debe volver en buen estado y en su embalaje. El coste de la devolución corre de su cuenta, salvo que el producto sea defectuoso o erróneo. Le devolveremos el importe, incluido el envío inicial estándar, en un máximo de 14 días desde que recibamos el producto, por el mismo medio de pago.</p>
         <p>No hay derecho de desistimiento en las piezas fabricadas a medida o por encargo, ni en las compras hechas por empresas o profesionales.</p>

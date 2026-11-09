@@ -611,6 +611,7 @@
       </div>` : ''}
       ${o.delivery && o.delivery.method !== 'pickup' && !transfer ? `<p>${t('Entrega estimada: {range}.', { range: etaRange(o.delivery.zone || 'peninsula', o.delivery.method, null, o.delivery.transitHours) })}</p>` : ''}
       ${o.delivery && o.delivery.method !== 'pickup' && tracking.available ? `<p class="muted small">${t('Quan tinguis el paquet, pots seguir-lo a <a href="#/seguiment">Seguiment</a> amb el número de comanda i el correu.')}</p>` : ''}
+      ${tracking.available ? `<p class="muted small">${t('Si te n\'penedeixes, pots cancel·lar-la des de <a href="#/seguiment">Seguiment</a> mentre no hagi sortit del taller.')}</p>` : ''}
       <p class="muted small">${t('Total')} ${pricing.rawMoney(o.totals.total)} · ${t(payments.methods.find((x) => x.id === o.method)?.name || '')}${o.delivery ? ` · ${o.delivery.method === 'carrier' ? esc(o.delivery.name || '') : shipName(o.delivery.method)}` : ''}</p>
       <a class="btn" href="#/botiga">${t('Continua comprant')}</a>
     </section>`;
@@ -724,7 +725,7 @@
     return `
     <div class="track-card">
       <h2>${esc(r.number)}${r.status === 'nova' ? ` <span class="track-tag">${t('Pendent de pagament')}</span>` : ''}</h2>
-      ${cancelled ? `<p>${t('Aquesta comanda s\'ha cancel·lat.')}</p>` : `
+      ${cancelled ? `<p>${t('Aquesta comanda s\'ha cancel·lat.')}</p>${r.refunded > 0 ? `<p class="muted">${t('T\'hem retornat {amount} a la targeta. El banc pot trigar entre 5 i 10 dies laborables a mostrar-ho.', { amount: pricing.rawMoney(r.refunded) })}</p>` : ''}` : `
       <ol class="track-steps">${steps.map((s, i) => `<li class="${i < cur ? 'is-done' : i === cur ? 'is-now' : ''}"><span></span>${t(pickup && s === 'Lliurada' ? 'Recollida al taller' : s)}</li>`).join('')}</ol>
       ${expected}
       ${r.shippedAt ? `<p class="muted">${t('Sortida: {date}', { date: day(r.shippedAt) })}</p>` : ''}
@@ -735,6 +736,12 @@
         <div><dt>${t('Número de seguiment')}</dt><dd class="mono">${esc(r.tracking)}</dd></div>
       </dl>${url ? `<a class="btn" href="${esc(url)}" target="_blank" rel="noopener">${t('Segueix el paquet al transportista')}</a>` : ''}`
         : (!pickup && r.status === 'pagada' ? `<p class="muted">${t('Encara no ha sortit. Quan el paquet surti, aquí hi veuràs el seguiment.')}</p>` : '')}`}
+      ${r.cancellable ? `<div class="track-cancel">
+        <h3>${t('Vols cancel·lar la comanda?')}</h3>
+        <p class="muted small">${r.status === 'nova' ? t('Encara no l\'has pagat: es cancel·la sense cap cost.')
+          : t('Pots cancel·lar-la fins al {date}, mentre no hagi sortit del taller. Et retornem tot l\'import a la mateixa targeta.', { date: new Date(r.cancelUntil).toLocaleString(window.I18N.lang, { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }) })}</p>
+        <button type="button" class="btn btn-ghost" data-cancel="${esc(r.number)}">${t('Cancel·la la comanda')}</button>
+      </div>` : ''}
     </div>`;
   }
 
@@ -807,17 +814,31 @@
   function bind(name, arg) {
     if (name === 'seguiment') {
       const form = $('#track-form'); const out = $('#track-result');
+      const consult = async () => {
+        const r = await tracking.lookup(form.number.value, form.email.value);
+        out.innerHTML = r ? trackHTML(r) : `<p class="ship-warn">${t('No trobem cap comanda amb aquestes dades. Revisa el número i el correu amb què vas comprar.')}</p>`;
+      };
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (markInvalid(form)) return;
         const btn = $('button', form); btn.disabled = true; btn.textContent = t('Consultant…'); out.innerHTML = '';
-        try {
-          const r = await tracking.lookup(form.number.value, form.email.value);
-          out.innerHTML = r ? trackHTML(r) : `<p class="ship-warn">${t('No trobem cap comanda amb aquestes dades. Revisa el número i el correu amb què vas comprar.')}</p>`;
-        } catch (err) {
+        try { await consult(); } catch (err) {
           out.innerHTML = `<p class="ship-warn">${esc(err.message)}</p>`;
         }
         btn.disabled = false; btn.textContent = t('Consulta la comanda');
+      });
+      out.addEventListener('click', async (e) => {
+        const b = e.target.closest('[data-cancel]');
+        if (!b) return;
+        if (!window.confirm(t('Segur que vols cancel·lar la comanda {n}? No es pot desfer.', { n: b.dataset.cancel }))) return;
+        b.disabled = true; b.textContent = t('Cancel·lant…');
+        try {
+          await tracking.cancel(b.dataset.cancel, form.email.value);
+          await consult();
+        } catch (err) {
+          b.disabled = false; b.textContent = t('Cancel·la la comanda');
+          b.insertAdjacentHTML('afterend', `<p class="ship-warn">${esc(err.message)}</p>`);
+        }
       });
     }
 
