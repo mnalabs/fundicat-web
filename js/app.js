@@ -2,6 +2,7 @@
 // Astro/Next més endavant reaprofitant Store i el CSS tal qual.
 (function () {
   const { catalog, pricing, cart, carriers, payments, quotes, tracking, config, history, recommend } = window.Store;
+  const Account = window.Account || { enabled: false, loggedIn: false, subscribe() {} };
   const { t } = window.I18N;
   const main = document.getElementById('main');
   const $ = (sel, el = document) => el.querySelector(sel);
@@ -235,7 +236,7 @@
       ${h.heroImage ? `<img class="hero-photo" src="${esc(h.heroImage)}" alt="">` : ''}
       <div class="wrap hero-copy">
         <h1>${esc(h.heroTitle || t('Tot per fondre metall.'))}</h1>
-        <p class="lead">${esc(h.heroLead || t('Sorres, crisols, forns i peces a mida. Fet i enviat des de Manresa.'))}</p>
+        <p class="lead">${esc(h.heroLead || t('Sorres de fosa, crisols, forns i peces a mida per a joiers i fundidors.'))}</p>
         <div class="cta-row">
           <a class="btn btn-lg btn-light" href="#/botiga">${t('Compra ara')}</a>
           <a class="btn btn-lg btn-outline-light" href="#/#serveis">${t('Encarrega una peça')}</a>
@@ -281,7 +282,7 @@
               ${[
                 ['Explica\'ns què necessites', 'Un plànol, una foto, una mostra o només la idea.'],
                 ['Rep el pressupost', 'Preu per unitat i per volum, sense compromís.'],
-                ['Fabriquem i t\'ho enviem', 'Des del nostre taller de Manresa.'],
+                ['Fabriquem i t\'ho enviem', 'Del nostre taller a la teva porta.'],
               ].map(([h, p], i) => `<li><span class="n">${i + 1}</span><div><b>${t(h)}</b><span>${t(p)}</span></div></li>`).join('')}
             </ol>
             ${catalog.customParts()[0] ? `<p class="quick-proof">${t('Preus de referència: {part}, des de {price}/u.', { part: esc(catalog.customParts()[0].name), price: pricing.rawMoney(catalog.customParts()[0].unit) })}</p>` : ''}
@@ -451,7 +452,7 @@
     const freeFrom = config.shipping.zones?.[0]?.freeFrom || 0;
     const pct = freeFrom > 0 ? Math.min(100, (tot.subtotal / freeFrom) * 100) : 0;
     return `
-    <section class="wrap page-head"><h1>${t('Cistella')}</h1><p class="lead">${t('Total: {total}', { total: m(tot.total) })}</p></section>
+    <section class="wrap page-head"><h1>${t('Cistella')}</h1><p class="lead">${t('Total: {total}', { total: m(tot.total) })}</p><a class="btn btn-lg head-pay" href="#/checkout">${t('Tramita la comanda')}</a></section>
     <section class="wrap checkout-grid">
       <div>
         ${freeFrom > 0 ? `<div class="ship-meter">
@@ -547,6 +548,9 @@
     <section class="wrap page-head"><h1>${t('Tramitació')}</h1></section>
     <form class="wrap checkout-grid" id="checkout" novalidate>
       <div>
+        ${Account.enabled ? (Account.loggedIn
+          ? `<div class="acct-box"><p><b>${t('Hola, {name}', { name: esc((Account.name || Account.email).split(' ')[0]) })}</b> ${t('Hem omplert les teves dades. Revisa-les i paga.')} <a href="#/compte">${t('El meu compte')}</a></p><label style="display:flex;gap:8px;align-items:center;margin-top:8px"><input type="checkbox" name="saveProfile" checked> ${t('Desa aquestes dades per a la propera compra')}</label></div>`
+          : `<div class="acct-box"><p>${t('Ja tens compte?')} <a href="#/compte?next=checkout">${t('Entra')}</a> ${t('i no hauràs d\'escriure res. Si no, continua: no cal compte per comprar.')}</p></div>`) : ''}
         <fieldset>
           <legend>${t('Contacte')}</legend>
           <div class="field-row">
@@ -613,6 +617,14 @@
       ${o.delivery && o.delivery.method !== 'pickup' && tracking.available ? `<p class="muted small">${t('Quan tinguis el paquet, pots seguir-lo a <a href="#/seguiment">Seguiment</a> amb el número de comanda i el correu.')}</p>` : ''}
       ${tracking.available ? `<p class="muted small">${t('Si te n\'penedeixes, pots cancel·lar-la des de <a href="#/seguiment">Seguiment</a> mentre no hagi sortit del taller.')}</p>` : ''}
       <p class="muted small">${t('Total')} ${pricing.rawMoney(o.totals.total)} · ${t(payments.methods.find((x) => x.id === o.method)?.name || '')}${o.delivery ? ` · ${o.delivery.method === 'carrier' ? esc(o.delivery.name || '') : shipName(o.delivery.method)}` : ''}</p>
+      ${Account.enabled && !Account.loggedIn ? `<form class="acct-box acct-quick" id="acct-quick" novalidate>
+        <h2>${t('Crea el teu compte en 2 minuts')}</h2>
+        <p class="muted small">${t('Hi desarem el nom, el correu i l\'adreça d\'aquesta comanda perquè la propera vegada no hagis d\'escriure res. Només cal triar una contrasenya.')}</p>
+        <label class="field" style="margin-top:12px"><span>${t('Contrasenya (mínim 8 caràcters)')}</span><input name="password" type="password" minlength="8" required autocomplete="new-password"></label>
+        <p class="form-error" id="quick-msg" hidden></p>
+        <button class="btn" type="submit">${t('Crea el compte')}</button>
+      </form>` : ''}
+      ${Account.loggedIn ? `<p class="muted small">${t('La comanda ja és al teu compte.')} <a href="#/compte">${t('El meu compte')}</a></p>` : ''}
       <a class="btn" href="#/botiga">${t('Continua comprant')}</a>
     </section>`;
   };
@@ -695,7 +707,7 @@
   views.seguiment = (params) => {
     const last = payments.lastOrder();
     const number = params.get('n') || last?.number || '';
-    const email = last && last.number === number ? last.customer?.email || '' : '';
+    const email = last && last.number === number ? last.customer?.email || '' : (Account.loggedIn ? Account.email : '');
     return `
     <section class="wrap page-head"><h1>${t('Segueix la teva comanda')}</h1><p class="lead">${t('Escriu el número de comanda i el correu amb què has comprat.')}</p></section>
     <section class="wrap track">
@@ -778,8 +790,170 @@
 
   views.notFound = () => `<section class="wrap empty-cart"><h1>${t('No hem trobat aquesta pàgina.')}</h1><a class="btn" href="#/">${t('Torna a l\'inici')}</a></section>`;
 
+  // ---------- Compte de client ----------
+  const statusName = { nova: 'Pendent de pagament', pagada: 'Pagada', enviada: 'Enviada', lliurada: 'Lliurada', 'cancel·lada': 'Cancel·lada' };
+  const profileFields = (p = {}) => `
+    <div class="field-row">
+      <label class="field"><span>${t('Nom i cognoms')}</span><input name="name" required autocomplete="name" value="${esc(p.name || '')}"></label>
+      <label class="field"><span>${t('Telèfon')}</span><input name="phone" type="tel" autocomplete="tel" value="${esc(p.phone || '')}"></label>
+    </div>
+    <label class="field"><span>${t('NIF o CIF')} <em>${t('(opcional)')}</em></span><input name="nif" value="${esc(p.nif || '')}"></label>
+    <label class="field"><span>${t('Adreça')}</span><input name="address" autocomplete="street-address" value="${esc(p.address || '')}"></label>
+    <div class="field-row field-row-3">
+      <label class="field"><span>${t('Codi postal')}</span><input name="zip" autocomplete="postal-code" value="${esc(p.zip || '')}"></label>
+      <label class="field"><span>${t('Població')}</span><input name="city" autocomplete="address-level2" value="${esc(p.city || '')}"></label>
+      <label class="field"><span>${t('País')}</span><select name="country">${config.countries.map((c) => `<option value="${c}" ${c === (p.country || 'Espanya') ? 'selected' : ''}>${t(c)}</option>`).join('')}</select></label>
+    </div>`;
+
+  views.compte = (params) => {
+    if (!Account.enabled) return views.notFound();
+    if (Account.recovering) {
+      return `<section class="wrap page-head"><h1>${t('Nova contrasenya')}</h1></section>
+      <section class="wrap acct"><form class="acct-card" id="acct-newpw" novalidate>
+        <label class="field"><span>${t('Contrasenya (mínim 8 caràcters)')}</span><input name="password" type="password" minlength="8" required autocomplete="new-password"></label>
+        <p class="form-error" id="acct-msg" hidden></p>
+        <button class="btn" type="submit">${t('Desa la contrasenya')}</button></form></section>`;
+    }
+    if (!Account.loggedIn) {
+      const up = params.get('tab') === 'up';
+      return `<section class="wrap page-head"><h1>${t('Compte')}</h1><p class="lead">${t('Desa les teves dades i compra més ràpid. No cal compte per comprar.')}</p></section>
+      <section class="wrap acct"><div class="acct-card">
+        <div class="acct-tabs" role="tablist"><button type="button" data-acct-tab="in" class="${up ? '' : 'is-on'}">${t('Entra')}</button><button type="button" data-acct-tab="up" class="${up ? 'is-on' : ''}">${t('Crea el compte')}</button></div>
+        <form id="acct-in" ${up ? 'hidden' : ''} novalidate>
+          <label class="field"><span>${t('Correu electrònic')}</span><input name="email" type="email" required autocomplete="email"></label>
+          <label class="field"><span>${t('Contrasenya')}</span><input name="password" type="password" required autocomplete="current-password"></label>
+          <button class="btn btn-block" type="submit">${t('Entra')}</button>
+          <p class="muted small" style="margin-top:12px"><button type="button" class="link-btn" id="acct-forgot">${t('He oblidat la contrasenya')}</button></p>
+        </form>
+        <form id="acct-up" ${up ? '' : 'hidden'} novalidate>
+          <label class="field"><span>${t('Nom i cognoms')}</span><input name="name" required autocomplete="name"></label>
+          <label class="field"><span>${t('Correu electrònic')}</span><input name="email" type="email" required autocomplete="email"></label>
+          <label class="field"><span>${t('Contrasenya (mínim 8 caràcters)')}</span><input name="password" type="password" minlength="8" required autocomplete="new-password"></label>
+          <button class="btn btn-block" type="submit">${t('Crea el compte')}</button>
+          <p class="muted small" style="margin-top:12px">${t('En crear el compte acceptes la {link}.', { link: `<a href="#/legal/privadesa">${t('política de privadesa')}</a>` })}</p>
+        </form>
+        <p class="form-error" id="acct-msg" hidden></p>
+      </div></section>`;
+    }
+    return `<section class="wrap page-head"><h1>${t('Hola, {name}', { name: esc((Account.name || Account.email).split(' ')[0]) })}</h1><p class="lead">${esc(Account.email)}</p></section>
+    <section class="wrap acct">
+      <form id="acct-profile" novalidate>
+        <h2 style="margin-top:0">${t('Les meves dades d\'enviament')}</h2>
+        <div id="acct-fields">${profileFields({ name: Account.name })}</div>
+        <p class="form-error" id="acct-msg" hidden></p>
+        <button class="btn" type="submit">${t('Desa les dades')}</button>
+      </form>
+      <h2>${t('Les meves comandes')}</h2>
+      <ul class="acct-orders" id="acct-orders"><li class="muted">${t('Carregant…')}</li></ul>
+      <div class="acct-actions">
+        <button type="button" class="btn btn-ghost" id="acct-out">${t('Surt')}</button>
+        <button type="button" class="link-btn muted small" id="acct-del">${t('Esborra el meu compte')}</button>
+      </div>
+    </section>`;
+  };
+
+  function bindAccount(params) {
+    const msg = (text, ok = false) => { const el = $('#acct-msg'); if (!el) return; el.textContent = t(text); el.hidden = !text; el.style.color = ok ? 'inherit' : ''; };
+    const back = () => { location.hash = params.get('next') === 'checkout' ? '#/checkout' : '#/compte'; render(); };
+    $$('[data-acct-tab]').forEach((b) => b.addEventListener('click', () => {
+      const up = b.dataset.acctTab === 'up';
+      $('#acct-in').hidden = up; $('#acct-up').hidden = !up; msg('');
+      $$('[data-acct-tab]').forEach((x) => x.classList.toggle('is-on', x === b));
+    }));
+    $('#acct-in')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const f = e.target; if (markInvalid(f)) return;
+      const btn = $('button[type=submit]', f); btn.disabled = true; msg('');
+      try { await Account.signIn(f.email.value, f.password.value); back(); } catch (err) { msg(err.message); btn.disabled = false; }
+    });
+    $('#acct-up')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const f = e.target; if (markInvalid(f)) return;
+      const btn = $('button[type=submit]', f); btn.disabled = true; msg('');
+      try {
+        const r = await Account.signUp({ email: f.email.value, password: f.password.value, name: f.name.value });
+        if (r.signedIn) { await Account.saveProfile({ name: f.name.value }).catch(() => {}); back(); }
+        else { msg(t('T\'hem enviat un correu per confirmar el compte. Obre\'l i torna aquí per entrar.'), true); btn.disabled = false; }
+      } catch (err) { msg(err.message); btn.disabled = false; }
+    });
+    $('#acct-forgot')?.addEventListener('click', async () => {
+      const email = $('#acct-in').email.value.trim();
+      if (!email) { msg(t('Escriu el teu correu a dalt i torna a prémer aquí.')); return; }
+      try { await Account.recover(email); msg(t('Si aquest correu té compte, hi rebràs un enllaç per posar una contrasenya nova.'), true); } catch (err) { msg(err.message); }
+    });
+    $('#acct-newpw')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const f = e.target; if (markInvalid(f)) return;
+      try { await Account.setPassword(f.password.value); render(); } catch (err) { msg(err.message); }
+    });
+    if (Account.loggedIn && $('#acct-profile')) {
+      Account.profile().then((p) => { if ($('#acct-fields')) $('#acct-fields').innerHTML = profileFields(p || { name: Account.name }); }).catch(() => {});
+      Account.orders().then((rows) => {
+        const el = $('#acct-orders'); if (!el) return;
+        el.innerHTML = rows.length ? rows.map((o) => `<li><span><b>${esc(o.number)}</b> · ${new Date(o.created_at).toLocaleDateString(window.I18N.lang)}<br><span class="muted small">${t(statusName[o.status] || o.status)} · ${pricing.rawMoney(o.total)}</span></span><a class="btn btn-ghost" href="#/seguiment?n=${encodeURIComponent(o.number)}">${t('Segueix-la')}</a></li>`).join('')
+          : `<li class="muted">${t('Encara no has fet cap comanda.')}</li>`;
+      }).catch(() => { const el = $('#acct-orders'); if (el) el.innerHTML = ''; });
+      $('#acct-profile').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const f = e.target; if (markInvalid(f)) return;
+        const btn = $('button[type=submit]', f); btn.disabled = true;
+        try { await Account.saveProfile(Object.fromEntries(new FormData(f))); msg(t('Dades desades.'), true); } catch (err) { msg(err.message); }
+        btn.disabled = false;
+      });
+      $('#acct-out').addEventListener('click', async () => { await Account.signOut(); location.hash = '#/'; render(); });
+      $('#acct-del').addEventListener('click', async () => {
+        if (!window.confirm(t('Segur que vols esborrar el teu compte i les teves dades? No es pot desfer. Les comandes ja fetes es conserven per obligació comptable, però sense lligar-les a tu.'))) return;
+        try { await Account.deleteAccount(); location.hash = '#/'; render(); } catch (err) { msg(err.message); }
+      });
+    }
+  }
+
+  // Pàgina de gràcies: crea el compte amb les dades de la comanda i només una contrasenya.
+  function bindQuickAccount() {
+    const f = $('#acct-quick'); if (!f) return;
+    f.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const o = payments.lastOrder(); const out = $('#quick-msg');
+      if (markInvalid(f) || !o) return;
+      const btn = $('button[type=submit]', f); btn.disabled = true; out.hidden = true;
+      try {
+        const r = await Account.signUp({ email: o.customer.email, password: f.password.value, name: o.customer.name });
+        if (!r.signedIn) { out.textContent = t('T\'hem enviat un correu per confirmar el compte. Obre\'l i torna aquí per entrar.'); out.hidden = false; btn.disabled = false; return; }
+        await Account.saveProfile(o.customer).catch(() => {});
+        await Account.claim(o).catch(() => {});
+        render();
+      } catch (err) { out.textContent = t(err.message); out.hidden = false; btn.disabled = false; }
+    });
+  }
+
+  // Icona del compte a la capçalera (només si la botiga té comptes).
+  function paintAccount() {
+    const a = $('#account-link'); if (!a) return;
+    a.hidden = !Account.enabled;
+    const dot = $('.acct-dot', a); if (dot) dot.hidden = !Account.loggedIn;
+  }
+
   // ---------- Enrutador ----------
+  // Les adreces netes de SEO (/producte/arena/, /es/producto/arena/...) mostren la mateixa vista que el «#».
+  const PATH_KINDS = { producte: 'producte', producto: 'producte', product: 'producte', prodotto: 'producte', categoria: 'categoria', category: 'categoria', servei: 'servei', servicio: 'servei', service: 'servei', servizio: 'servei', guia: 'guia', guide: 'guia', guida: 'guia' };
+  const LANDINGS = ['sorra-per-a-joieria', 'arena-para-joyeria', 'jewellery-casting-sand', 'sabbia-per-gioielleria'];
+  function pathRoute() {
+    const parts = location.pathname.replace(/^\/+|\/+$/g, '').split('/');
+    if (['es', 'en', 'it'].includes(parts[0])) parts.shift();
+    if (!parts[0]) return null;
+    if (LANDINGS.includes(parts[0])) return { name: 'landing' };
+    const kind = PATH_KINDS[parts[0]];
+    if (kind === 'categoria') return { name: 'botiga', params: new URLSearchParams(`cat=${parts[1] || ''}`) };
+    return kind ? { name: kind, arg: parts[1] } : null;
+  }
+  // Pàgina d'aterratge (SEO): el text ja ve escrit a l'HTML i no es repinta.
+  views.landing = () => main.innerHTML;
+
   function parse() {
+    if (!/^#\//.test(location.hash)) {
+      const r = pathRoute();
+      if (r) return { name: r.name, arg: r.arg, params: r.params || new URLSearchParams(), anchor: undefined };
+    }
     const raw = location.hash.replace(/^#\/?/, '');
     const [pathPart, query = ''] = raw.split('?');
     const [path, anchor] = pathPart.split('#');
@@ -812,6 +986,8 @@
   }
 
   function bind(name, arg) {
+    if (name === 'compte') bindAccount(parse().params);
+    if (name === 'comanda') bindQuickAccount();
     if (name === 'seguiment') {
       const form = $('#track-form'); const out = $('#track-result');
       const consult = async () => {
@@ -914,6 +1090,15 @@
       form.elements.country.addEventListener('change', () => { refresh(true); loadCarriers(); });
       $('#ship-options').addEventListener('change', (e) => { if (e.target.name === 'shipping') { selected = e.target.value; refresh(false); } });
       refresh(true);
+      // Amb sessió, les dades guardades omplen el formulari (el que ja hagi escrit el client no es toca).
+      if (Account.loggedIn) {
+        Account.profile().then((p) => {
+          if (!$('#checkout')) return;
+          const fill = { name: p?.name || Account.name, email: Account.email, phone: p?.phone, nif: p?.nif, address: p?.address, zip: p?.zip, city: p?.city, country: p?.country };
+          Object.entries(fill).forEach(([k, v]) => { const el = form.elements[k]; if (el && v && !el.value) el.value = v; });
+          form.elements.zip.dispatchEvent(new Event('input'));
+        }).catch(() => {});
+      }
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const bad = markInvalid(form);
@@ -921,6 +1106,10 @@
         if (bad) return;
         const btn = $('[type=submit]', form); btn.disabled = true; btn.textContent = t('Processant…');
         const data = Object.fromEntries(new FormData(form));
+        data.lang = window.I18N.lang; // els correus surten en l'idioma del client
+        const saveIt = data.saveProfile && Account.loggedIn;
+        delete data.saveProfile;
+        if (saveIt) Account.saveProfile(data).catch(() => {});
         try {
           const { redirect } = await payments.pay({ method: data.method, customer: data, shipping: data.shipping });
           if (redirect) { btn.textContent = t('Obrint el pagament segur…'); location.href = redirect; return; }
@@ -1084,6 +1273,17 @@
 
   window.I18N.applyStatic();
   paintLang();
+  paintAccount();
+  Account.subscribe(paintAccount);
   window.addEventListener('hashchange', render);
+  // Entrar des d'un enllaç (o tornar a la pàgina) sempre comença a dalt de tot:
+  // el navegador no recorda on érem i la primera pintada ignora els salts a seccions.
+  try { window.history.scrollRestoration = 'manual'; } catch { /* res */ }
   render();
+  window.scrollTo(0, 0);
+  let touched = false;
+  ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach((ev) => window.addEventListener(ev, () => { touched = true; }, { once: true, passive: true }));
+  const top = () => { if (!touched && window.scrollY) window.scrollTo(0, 0); };
+  window.addEventListener('load', top);
+  setTimeout(top, 400); setTimeout(top, 1200);
 })();

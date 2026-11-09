@@ -632,6 +632,25 @@ a.contact-card b { color: var(--link); }
 .legal b { color: var(--ink); }
 .legal-note { text-align: center; margin-top: 10px; }
 
+/* Compte de client */
+.acct-dot { position: absolute; top: 5px; right: 4px; width: 8px; height: 8px; border-radius: 50%; background: var(--ink); border: 2px solid var(--bg); }
+.acct { max-width: 560px; margin-bottom: 72px; }
+.acct-card, .acct-box { border: 1px solid var(--line); border-radius: 16px; background: var(--alt); padding: 20px 24px; }
+.acct-box { margin-bottom: 20px; padding: 14px 18px; font-size: .95rem; }
+.acct-box p { margin: 0; }
+.acct-tabs { display: flex; gap: 6px; margin-bottom: 18px; }
+.acct-tabs button { flex: 1; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: none; font: inherit; cursor: pointer; color: inherit; }
+.acct-tabs button.is-on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.acct .field { display: block; margin-bottom: 12px; }
+.acct h2 { margin: 28px 0 12px; font-size: 1.15rem; }
+.acct-orders { list-style: none; margin: 0; padding: 0; }
+.acct-orders li { display: flex; gap: 12px; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.acct-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
+.acct-quick { margin: 28px auto 0; max-width: 480px; text-align: left; }
+.acct-quick h2 { margin: 0 0 6px; font-size: 1.15rem; }
+.link-btn { background: none; border: 0; padding: 0; font: inherit; color: inherit; text-decoration: underline; cursor: pointer; }
+.page-head .head-pay { margin-top: 12px; }
+
 /* Cancel·lació de la comanda (Seguiment) */
 .track-cancel { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
 .track-cancel h3 { margin: 0 0 6px; font-size: 1rem; }

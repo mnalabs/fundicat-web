@@ -126,6 +126,7 @@
           marginPct: Math.min(100, Math.max(0, round2(num(s.packlink?.marginPct)))),
           marginFixed: Math.min(50, Math.max(0, round2(num(s.packlink?.marginFixed)))),
           addVat: !!s.packlink?.addVat,
+          disabled: [...new Set((Array.isArray(s.packlink?.disabled) ? s.packlink.disabled : []).map((n) => str(n, 60)).filter(Boolean))].slice(0, 60),
           box: { l: Math.min(300, Math.max(1, num(s.packlink?.box?.l, 30))), w: Math.min(300, Math.max(1, num(s.packlink?.box?.w, 20))), h: Math.min(300, Math.max(1, num(s.packlink?.box?.h, 15))) },
         },
         prepDays: Math.min(10, Math.max(0, s.prepDays === '' || s.prepDays == null ? 1 : Math.round(num(s.prepDays)))),
@@ -184,7 +185,7 @@
       number: o.number, date: o.created_at, status: o.status, method: o.method, customer: o.customer, lines: o.lines,
       subtotal: +o.subtotal, shipping: +o.shipping, total: +o.total, vat: +o.vat, delivery: o.delivery,
       label: o.label || undefined, labelError: o.label_error || undefined, carrierStatus: o.carrier_status || undefined,
-      payment: o.payment || undefined, cancelledAt: o.cancelled_at || undefined, cancelBy: o.cancel_by || undefined, refund: o.refund || undefined, shippedAt: o.shipped_at || undefined, deliveredAt: o.delivered_at || undefined,
+      payment: o.payment || undefined, emailLog: o.email_log || undefined, cancelledAt: o.cancelled_at || undefined, cancelBy: o.cancel_by || undefined, refund: o.refund || undefined, shippedAt: o.shipped_at || undefined, deliveredAt: o.delivered_at || undefined,
     });
     const mapQuote = (q) => ({ ...q, date: q.created_at });
 
@@ -212,7 +213,7 @@
       });
       return res;
     }
-    let connected = { stripe: false, sendcloud: false, push: false, packlink: false };
+    let connected = { stripe: false, sendcloud: false, push: false, packlink: false, email: false };
     let methods = [];
     let methodsError = '';
 
@@ -225,6 +226,7 @@
       get stripe() { return connected.stripe; },
       get pushReady() { return connected.push; },
       get packlink() { return connected.packlink; },
+      get email() { return connected.email; },
       hasSession: () => !!auth,
       async login({ email, password, remember }) {
         session.remember(!!remember);
@@ -270,7 +272,7 @@
           loadCatalog(), loadOrders(), rest('quotes?select=*&order=created_at.desc'),
           fn('status').then((r) => (r.ok ? r.json() : {})).catch(() => ({})), // funció encara no desplegada → res connectat
         ]);
-        connected = { stripe: !!status.stripe, sendcloud: !!status.sendcloud, push: !!status.push, packlink: !!status.packlink };
+        connected = { stripe: !!status.stripe, sendcloud: !!status.sendcloud, push: !!status.push, packlink: !!status.packlink, email: !!status.email };
         if (connected.sendcloud) {
           methodsError = '';
           methods = await fn('sendcloud-methods')
@@ -338,6 +340,12 @@
         const data = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(data.error || 'No s\'han pogut consultar els preus.');
         return data;
+      },
+      // Avisa el client per correu (només el primer cop de cada tipus): 'shipped' o 'delivered'.
+      async notifyCustomer(number, kind) {
+        const res = await fn('order-mail', { method: 'POST', body: { number, kind } });
+        if (res.status === 401) throw authError();
+        return res.json().catch(() => ({}));
       },
       async setQuoteStatus(ref, status) {
         const [q] = await rest(`quotes?ref=eq.${encodeURIComponent(ref)}`, { method: 'PATCH', body: { status }, prefer: 'return=representation' });
@@ -449,6 +457,7 @@
         if (!res.ok) throw new Error(data.error || 'No s\'ha pogut pujar la imatge.');
         return data.url;
       },
+      notifyCustomer: async () => ({ sent: 0 }),
       cancelOrder: () => Promise.reject(new Error('Cancel·lar amb reemborsament només funciona amb Supabase.')),
       packlinkPrices: () => Promise.reject(new Error('Només funciona amb Supabase.')),
       setOrderStatus: (number, status) => api(`/api/admin/orders/${encodeURIComponent(number)}`, { method: 'PATCH', body: { status } }),

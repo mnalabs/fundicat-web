@@ -208,6 +208,7 @@
     draft.config.cancel = { hours: 24, ...(draft.config.cancel || {}) };
     s.packlink = { enabled: false, marginPct: 0, marginFixed: 0, addVat: false, ...(s.packlink || {}) };
     s.packlink.box = { l: 30, w: 20, h: 15, ...(s.packlink.box || {}) };
+    if (!Array.isArray(s.packlink.disabled)) s.packlink.disabled = [];
     const SH = window.FundicatShipping;
     if (s.prepDays == null || s.prepDays === '') s.prepDays = SH.DEFAULT_PREP;
     (s.zones || []).forEach((z) => {
@@ -720,7 +721,7 @@
   };
 
   // ----- Portada -----
-  const DEFAULT_HERO = { heroTitle: 'Tot per fondre metall.', heroLead: 'Sorres, crisols, forns i peces a mida. Fet i enviat des de Manresa.' };
+  const DEFAULT_HERO = { heroTitle: 'Tot per fondre metall.', heroLead: 'Sorres de fosa, crisols, forns i peces a mida per a joiers i fundidors.' };
 
   VIEWS.portada = () => {
     const h = draft.home || {};
@@ -839,11 +840,24 @@
       render();
     } catch (err) { handle(err); }
   }
+  // Avisa el client per correu (només el primer cop de cada tipus). Si el correu no està connectat, no fa res.
+  async function tellCustomer(numbers, kind) {
+    if (!BE.email) return 0;
+    let sent = 0;
+    for (const n of numbers) { try { const r = await BE.notifyCustomer(n, kind); sent += r?.sent || 0; } catch (e) { if (e.auth) throw e; } }
+    if (sent) {
+      toast(`${sent === 1 ? 'Client avisat' : `${sent} clients avisats`} per correu.`);
+      BE.loadLive().then((r) => { orders = r.orders; if (location.hash.startsWith('#/comandes/')) render(); }).catch(() => {});
+    }
+    return sent;
+  }
+
   async function markShipped(numbers) {
     try {
       orders = await BE.markShipped(numbers);
       toast(`${numbers.length} comandes marcades com a enviades.`);
       render();
+      tellCustomer(numbers, 'shipped');
     } catch (err) { handle(err); }
   }
 
@@ -911,6 +925,7 @@
                 ${statusSelect(o).replace('<select', '<select class="inline-input"')}
                 <p class="muted small">Pagament: ${esc({ card: 'Targeta (Stripe)', bizum: 'Bizum', transfer: 'Transferència' }[o.method] || o.method)}${o.payment?.paidAt ? ` · cobrat el ${fmtDate(o.payment.paidAt)}` : ''}${o.payment?.paymentIntent ? ` · <a href="https://dashboard.stripe.com/payments/${esc(o.payment.paymentIntent)}" target="_blank" rel="noopener">veure a Stripe</a>` : ''}</p>
                 ${o.status === 'nova' ? `<p class="muted small">${o.method === 'transfer' ? PAID_HELP.transfer : PAID_HELP.card}</p><button type="button" class="btn" data-paid="${esc(o.number)}">Marca com a pagada</button>` : ''}
+                ${o.emailLog && Object.keys(o.emailLog).length ? `<p class="muted small">Correus enviats al client: ${Object.entries(o.emailLog).map(([k, v]) => `${({ paid: 'confirmació', shipped: 'enviament', delivered: 'lliurament', cancelled: 'cancel·lació' }[k] || esc(k))} (${fmtDate(v)})`).join(', ')}.</p>` : ''}
                 ${o.status === 'cancel·lada' ? `<p class="muted small">Cancel·lada${o.cancelledAt ? ` el ${fmtDate(o.cancelledAt)}` : ''}${o.cancelBy ? ` pel ${esc(o.cancelBy)}` : ''}.${o.refund?.amount ? ` Reemborsats ${eur(o.refund.amount)} al client.` : ''}${o.refund?.manual ? ' <b>Cal tornar els diners al client a mà</b> (no es va pagar amb targeta).' : ''}</p>` : ''}
                 ${['nova', 'pagada'].includes(o.status) ? `<hr style="border:0;border-top:1px solid var(--line);margin:12px 0"><p class="muted small">${o.status === 'nova' ? 'Encara no està pagada: es cancel·la sense cap cost.' : o.method === 'card' && o.payment?.paymentIntent ? 'Reemborsa tot l\'import al client a Stripe i torna l\'estoc.' : 'No es va cobrar amb targeta: hauràs de tornar els diners a mà. L\'estoc es retorna.'}${o.label ? ' <b>Ja té etiqueta: avisa el transportista si ja l\'havies creat.</b>' : ''}</p><button type="button" class="btn btn-ghost" data-cancel-order="${esc(o.number)}">Cancel·la la comanda</button>` : ''}
               </section>
@@ -921,9 +936,10 @@
                   ${o.label ? `<div><dt>Seguiment</dt><dd>${/^https:\/\//.test(o.label.trackingUrl || '') ? `<a href="${esc(o.label.trackingUrl)}" target="_blank" rel="noopener">${esc(o.label.tracking)}</a>` : esc(o.label.tracking)}${o.label.provider === 'prova' ? ' <span class="badge">Prova</span>' : ''}</dd></div>` : ''}
                   ${o.carrierStatus ? `<div><dt>Transportista</dt><dd>${esc(o.carrierStatus)}</dd></div>` : ''}
                 </dl>
+                ${o.delivery?.carrierCost != null ? `<dl class="meta"><div><dt>Ha pagat el client</dt><dd>${o.shipping ? eur(o.shipping) : 'Res'}${o.delivery.free ? ' <span class="badge badge-ok">Enviament gratuït</span>' : ''}</dd></div><div><dt>Et cobra el transportista</dt><dd>${eur(o.delivery.carrierCost)} <span class="muted small">amb IVA</span></dd></div><div><dt>Diferència</dt><dd class="${o.shipping - o.delivery.carrierCost < 0 ? 'low' : ''}">${eur(o.shipping - o.delivery.carrierCost)}</dd></div></dl>` : ''}
                 ${o.labelError ? `<p class="small low">Error en crear l'etiqueta automàtica: ${esc(o.labelError)}</p>` : ''}
                 ${isCarrier(o) ? `<div class="notice"><p class="small"><b>El client ha triat ${esc(o.delivery.carrier || '')}${o.delivery.service ? ` · ${esc(o.delivery.service)}` : ''}</b> i ha pagat ${eur(o.shipping)} d'enviament.</p>
-                  <p class="muted small">Crea l'enviament a Packlink PRO amb aquest transportista${o.delivery.packages?.[0] ? ` (paquet de ${esc(o.delivery.packages[0].length)} × ${esc(o.delivery.packages[0].width)} × ${esc(o.delivery.packages[0].height)} cm, ${esc(o.delivery.packages[0].weight)} kg)` : ''} i després desa aquí el número de seguiment.</p></div>` : ''}
+                  <p class="muted small">Crea l'enviament a Packlink PRO amb aquest transportista${o.delivery.packages?.[0] ? ` (${o.delivery.packages.length > 1 ? `${o.delivery.packages.length} paquets: ` : 'paquet de '}${o.delivery.packages.map((p) => `${esc(p.length)} × ${esc(p.width)} × ${esc(p.height)} cm, ${esc(p.weight)} kg`).join(' + ')})` : ''} i després desa aquí el número de seguiment.</p></div>` : ''}
                 ${isPickup(o)
                   ? '<p class="muted small">El client la recull al taller: no cal etiqueta. Avisa\'l quan estigui a punt i marca-la com a lliurada.</p>'
                   : isCarrier(o) ? ''
@@ -977,12 +993,35 @@
       </div>`;
   };
 
+  // Resum dels enviaments amb transportista dels últims 30 dies: què han pagat els clients i què cobra el transportista.
+  function shippingCosts() {
+    const since = Date.now() - 30 * DAY_MS;
+    const list = orders.filter((o) => o.delivery?.carrierCost != null && !['nova', 'cancel·lada'].includes(o.status) && new Date(o.date).getTime() >= since);
+    if (!list.length) return '';
+    const by = {};
+    list.forEach((o) => { const k = o.delivery.carrier || 'Altres'; const r = by[k] || (by[k] = { n: 0, paid: 0, cost: 0, free: 0 }); r.n += 1; r.paid += o.shipping || 0; r.cost += Number(o.delivery.carrierCost) || 0; if (o.delivery.free) r.free += 1; });
+    const sum = (f) => Object.values(by).reduce((s, r) => s + r[f], 0);
+    const diff = sum('paid') - sum('cost');
+    return `<div class="card card-flush">
+      <div class="toolbar"><h2 style="flex:1">Costos d'enviament (30 dies)</h2><span class="muted small">Només les comandes amb transportista triat pel client</span></div>
+      <div class="kpis" style="padding:12px 16px">
+        <div class="kpi"><span>Enviaments</span><b>${list.length}</b></div>
+        <div class="kpi"><span>Han pagat els clients</span><b>${eur(sum('paid'))}</b></div>
+        <div class="kpi"><span>Cobren els transportistes</span><b>${eur(sum('cost'))}</b></div>
+        <div class="kpi"><span>Diferència</span><b class="${diff < 0 ? 'low' : ''}">${eur(diff)}</b></div>
+      </div>
+      <table class="list"><thead><tr><th>Transportista</th><th class="num">Enviaments</th><th class="num">Gratuïts</th><th class="num">Clients</th><th class="num">Transportista</th></tr></thead>
+      <tbody>${Object.entries(by).sort((a, b) => b[1].n - a[1].n).map(([k, r]) => `<tr style="cursor:default"><td>${esc(k)}</td><td class="num">${r.n}</td><td class="num">${r.free}</td><td class="num">${eur(r.paid)}</td><td class="num">${eur(r.cost)}</td></tr>`).join('')}</tbody></table>
+    </div>`;
+  }
+
   async function updateOrderStatus(number, status) {
     try {
       const o = await BE.setOrderStatus(number, status);
       orders = orders.map((x) => (x.number === number ? o : x));
       toast(`${number}: ${ORDER_STATUS[status][0].toLowerCase()}.`);
       render();
+      if (status === 'enviada' || status === 'lliurada') tellCustomer([number], status === 'enviada' ? 'shipped' : 'delivered');
     } catch (err) { handle(err); render(); }
   }
   const bindRows = () => $$('tr[data-href]').forEach((tr) => tr.addEventListener('click', (e) => { if (!e.target.closest('a, select, label')) location.hash = tr.dataset.href; }));
@@ -1020,6 +1059,7 @@
         orders = orders.map((x) => (x.number === o.number ? o : x));
         toast(ship ? `${o.number}: seguiment desat i comanda enviada.` : `${o.number}: seguiment desat.`);
         render();
+        if (ship) tellCustomer([o.number], 'shipped');
       } catch (err) { handle(err); buttons.forEach((b) => { b.disabled = false; }); }
     }));
     $$('[data-paid]').forEach((b) => b.addEventListener('click', async () => {
@@ -1096,6 +1136,7 @@
           <div class="kpi"><span>Pendents de sortir</span><b>${waiting.length}</b></div>
           <div class="kpi"><span>Lliurats (30 dies)</span><b>${done.length}</b></div>
         </div>
+        ${shippingCosts()}
         <div class="card card-flush">
           <div class="toolbar"><h2 style="flex:1">En camí</h2><span class="muted small">Previsió amb els dies d'entrega de Configuració</span></div>
           ${sent.length ? `
@@ -1204,6 +1245,7 @@
         <h2>Connexions</h2>
         <dl class="meta">
           <div><dt>Pagaments amb targeta (Stripe)</dt><dd>${BE.stripe ? '<span class="badge badge-ok">Connectat</span>' : '<span class="badge">No connectat</span> <span class="muted small">Les comandes amb targeta queden pendents de pagament.</span>'}</dd></div>
+          <div><dt>Correus als clients (Resend)</dt><dd>${BE.email ? '<span class="badge badge-ok">Connectat</span>' : '<span class="badge">No connectat</span> <span class="muted small">Falta la clau <code>RESEND_API_KEY</code> a Supabase → Edge Functions → Secrets. Mentrestant no s\'envia cap correu.</span>'}</dd></div>
           <div><dt>Etiquetes d'enviament (Sendcloud)</dt><dd>${!BE.sendcloud ? '<span class="badge">No connectat</span> <span class="muted small">Les etiquetes són de prova.</span>'
             : BE.sendcloudError ? `<span class="badge badge-bad">Error</span> <span class="small">${esc(BE.sendcloudError)}</span>`
             : '<span class="badge badge-ok">Connectat</span>'}</dd></div>
@@ -1250,7 +1292,8 @@
           <label class="field"><span>Més un import fix</span><div class="prefix" data-suffix="€"><input data-f="config.shipping.packlink.marginFixed" data-type="number" type="number" min="0" max="50" step="0.05"></div><small>Per cobrir embalatge i gestió. Tot a 0 = el client paga exactament el que cobra Packlink.</small></label>
         </div>
         <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-f="config.shipping.packlink.addVat"> Els preus de Packlink no porten IVA: afegir-hi el 21%</label>
-        <p class="muted small">Caixa estàndard, per als productes que no tenen mides pròpies:</p>
+        <label class="field" style="max-width:340px"><span>Enviament gratuït a partir de</span><div class="prefix" data-suffix="€"><input id="free-from" type="number" min="0" step="1" value="${Number(draft.config.shipping.zones?.[0]?.freeFrom) || 0}"></div><small>Quan la comanda arriba a aquest import, el transportista més barat és gratuït per al client (les opcions més ràpides només paguen la diferència; el cost el pagues tu). 0 = no n'hi ha. S'aplica a totes les zones; per posar un import diferent a cada zona, canvia'l a la taula de tarifes.</small></label>
+        <p class="muted small">Caixa estàndard, per als productes que no tenen mides pròpies. Si la cistella té molts productes, es reparteixen sols en diversos paquets (com a molt 30 kg i 100 cm d'alt cadascun):</p>
         <div class="row" style="grid-template-columns:repeat(3,1fr)">
           <label class="field"><span>Llarg</span><div class="prefix" data-suffix="cm"><input data-f="config.shipping.packlink.box.l" data-type="number" type="number" min="1" max="300" step="0.5"></div></label>
           <label class="field"><span>Ample</span><div class="prefix" data-suffix="cm"><input data-f="config.shipping.packlink.box.w" data-type="number" type="number" min="1" max="300" step="0.5"></div></label>
@@ -1266,7 +1309,7 @@
           <label class="field"><span>Pes (kg)</span><input name="kg" class="inline-input" type="number" min="0.1" max="70" step="0.1" value="5.2"></label>
           <label class="field"><span>Mides (cm)</span><input name="dims" class="inline-input" value="${esc(`${draft.config.shipping.packlink.box.l}x${draft.config.shipping.packlink.box.w}x${draft.config.shipping.packlink.box.h}`)}" placeholder="26x17x12"></label>
           <button class="btn" type="submit">Consulta els preus</button>
-        </form><div id="pl-result" aria-live="polite" style="margin-top:12px"></div>` : '<p class="muted small">Cal connectar Packlink abans (clau <code>PACKLINK_API_KEY</code> a Supabase).</p>'}
+        </form><div id="pl-result" aria-live="polite" style="margin-top:12px"></div><div id="pl-disabled" style="margin-top:12px"></div>` : '<p class="muted small">Cal connectar Packlink abans (clau <code>PACKLINK_API_KEY</code> a Supabase).</p>'}
       </section>
       <section class="card card-flush" data-sec="cfg:enviaments">
         <div class="toolbar"><h2 style="flex:1">Dies d'entrega</h2><span class="muted small">Dies laborables (dilluns a divendres)</span></div>
@@ -1333,10 +1376,34 @@
       </section>
       <div class="note" data-sec="cfg:connexions">Pendent de connectar: correus automàtics als clients i facturació (Verifactu).</div>
     </div>`;
+  // Transportistes amb què treballes (Configuració > Enviaments). Els desactivats no surten mai al client.
+  const carrierOn = (name) => !(draft.config.shipping.packlink.disabled || []).some((n) => n.toLowerCase() === String(name).toLowerCase());
+  const carrierSwitch = (name) => `<label class="switch" title="${carrierOn(name) ? 'Hi treballes' : 'Desactivat'}"><input type="checkbox" data-carrier="${esc(name)}" ${carrierOn(name) ? 'checked' : ''} aria-label="Treballar amb ${esc(name)}"><i></i></label>`;
+  function setCarrier(name, on) {
+    const list = (draft.config.shipping.packlink.disabled || []).filter((n) => n.toLowerCase() !== String(name).toLowerCase());
+    if (!on) list.push(String(name));
+    draft.config.shipping.packlink.disabled = list;
+    markDirty(); paintDisabled();
+  }
+  function paintDisabled() {
+    const box = $('#pl-disabled'); if (!box) return;
+    const list = draft.config.shipping.packlink.disabled || [];
+    box.innerHTML = list.length ? `<p class="muted small" style="margin-bottom:6px">Transportistes desactivats (no es mostren mai als clients):</p><div style="display:flex;gap:8px;flex-wrap:wrap">${list.map((n) => `<span class="badge">${esc(n)} <button type="button" class="link-btn" data-enable="${esc(n)}" style="margin-left:4px">Activa</button></span>`).join('')}</div>` : '';
+    $$('[data-enable]', box).forEach((b) => b.addEventListener('click', () => {
+      setCarrier(b.dataset.enable, true);
+      $$('[data-carrier]').forEach((c) => { if (c.dataset.carrier.toLowerCase() === b.dataset.enable.toLowerCase()) c.checked = true; });
+    }));
+  }
   BINDS.configuracio = () => {
     bindFields($('#main'), draft);
     bindSecTabs($('#main'));
     paintPush();
+    $('#free-from')?.addEventListener('input', (e) => {
+      const v = Math.max(0, Number(e.target.value) || 0);
+      (draft.config.shipping.zones || []).forEach((z) => { z.freeFrom = v; });
+      markDirty();
+    });
+    paintDisabled();
     $('#pl-form')?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const f = e.target; const out = $('#pl-result'); const btn = $('button', f);
@@ -1345,9 +1412,10 @@
       try {
         const r = await BE.packlinkPrices({ country: f.country.value, zip: f.zip.value, kg: Number(f.kg.value), l, w, h });
         const m = r.margin;
-        const rows = r.services.map((s, i) => `<tr style="cursor:default"><td>${esc(s.carrier)}${i === 0 ? ' <span class="badge badge-ok">Més barat</span>' : ''}</td><td>${esc(s.name)}</td><td>${s.hours ? (s.hours < 48 ? `${s.hours} h` : `${Math.round(s.hours / 24)} dies`) : esc(s.time) || '—'}</td><td>${eur(s.total)}${s.base ? `<br><span class="muted small">${eur(s.base)} + IVA ${eur(s.tax)}</span>` : ''}</td><td><b>${eur(s.client)}</b></td></tr>`).join('');
-        out.innerHTML = r.services.length ? `<div style="overflow-x:auto"><table class="list"><thead><tr><th>Transportista</th><th>Servei</th><th>Trànsit</th><th>Cobra Packlink</th><th>Pagaria el client</th></tr></thead><tbody>${rows}</tbody></table></div>
-          <p class="muted small">Paquet de ${r.parcel.kg} kg i ${r.parcel.length}×${r.parcel.width}×${r.parcel.height} cm. Marge actual: ${m.pct}% + ${eur(m.fixed)}${m.addVat ? ' i IVA afegit' : ''}. «Pagaria el client» és el que veuria al pagament. La botiga només ensenya els 6 més barats.</p>` : '<p class="muted">Cap transportista disponible per a aquest destí i paquet.</p>';
+        const rows = r.services.map((s, i) => `<tr style="cursor:default"><td>${carrierSwitch(s.carrier)}</td><td>${esc(s.carrier)}${i === 0 ? ' <span class="badge badge-ok">Més barat</span>' : ''}</td><td>${esc(s.name)}</td><td>${s.hours ? (s.hours < 48 ? `${s.hours} h` : `${Math.round(s.hours / 24)} dies`) : esc(s.time) || '—'}</td><td>${eur(s.total)}${s.base ? `<br><span class="muted small">${eur(s.base)} + IVA ${eur(s.tax)}</span>` : ''}</td><td><b>${eur(s.client)}</b></td></tr>`).join('');
+        out.onchange = (ev) => { const c = ev.target.closest('[data-carrier]'); if (c) setCarrier(c.dataset.carrier, c.checked); };
+        out.innerHTML = r.services.length ? `<div style="overflow-x:auto"><table class="list"><thead><tr><th>Hi treballo</th><th>Transportista</th><th>Servei</th><th>Trànsit</th><th>Cobra Packlink</th><th>Pagaria el client</th></tr></thead><tbody>${rows}</tbody></table></div>
+          <p class="muted small">Paquet de ${r.parcel.kg} kg i ${r.parcel.length}×${r.parcel.width}×${r.parcel.height} cm. Marge actual: ${m.pct}% + ${eur(m.fixed)}${m.addVat ? ' i IVA afegit' : ''}. «Pagaria el client» és el que veuria al pagament. La botiga només ensenya els 6 més barats dels que tinguis activats. Els canvis dels interruptors s'apliquen en prémer «Desa» a la barra de sota.</p>` : '<p class="muted">Cap transportista disponible per a aquest destí i paquet.</p>';
       } catch (err) { out.innerHTML = ''; handle(err); }
       btn.disabled = false;
     });

@@ -2,7 +2,7 @@
 // d'un fitxer fix) i després els scripts que el fan servir, en ordre.
 (function () {
   const B = window.FUNDICAT_BACKEND || { type: 'local' };
-  const SCRIPTS = ['js/shipping.js', 'js/legal.js', 'js/store.js', 'js/app.js'];
+  const SCRIPTS = ['js/shipping.js', 'js/legal.js', 'js/account.js', 'js/store.js', 'js/app.js'];
 
   const load = (src) => new Promise((resolve, reject) => {
     const s = document.createElement('script');

@@ -32,6 +32,9 @@
       endpoint = `${BACKEND.url}/rest/v1/rpc/${url.endsWith('/orders') ? 'place_order' : 'submit_quote'}`;
       payload = { payload: body };
       headers.apikey = BACKEND.key;
+      // Amb sessió de client, la comanda queda lligada al seu compte.
+      const tk = url.endsWith('/orders') && window.Account?.loggedIn ? await window.Account.token() : null;
+      if (tk) headers.Authorization = `Bearer ${tk}`;
     }
     const res = await fetch(endpoint, { method: 'POST', headers, body: JSON.stringify(payload) });
     const data = await res.json().catch(() => ({}));

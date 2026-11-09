@@ -96,7 +96,6 @@
     ['Rep el pressupost en 24 h', 'Recibe el presupuesto en 24 h', 'Get a quote within 24 h', 'Ricevi il preventivo in 24 h'],
     ['Preu per unitat i per volum, sense compromís.', 'Precio por unidad y por volumen, sin compromiso.', 'Unit and volume pricing, no obligation.', 'Prezzo unitario e per quantità, senza impegno.'],
     ['Fabriquem i t\'ho enviem', 'Fabricamos y te lo enviamos', 'We make it and ship it', 'Lo produciamo e te lo spediamo'],
-    ['Normalment en una setmana, des de Manresa.', 'Normalmente en una semana, desde Manresa.', 'Usually within a week, from Manresa.', 'Di solito in una settimana, da Manresa.'],
     ['Preus de referència: {part}, des de {price}/u.', 'Precios de referencia: {part}, desde {price}/ud.', 'Reference prices: {part}, from {price} each.', 'Prezzi di riferimento: {part}, da {price} cad.'],
     ['Pressupost ràpid', 'Presupuesto rápido', 'Quick quote', 'Preventivo rapido'],
     ['Sense compromís. Et responem en 24 hores laborables.', 'Sin compromiso. Te respondemos en 24 horas laborables.', 'No obligation. We reply within 24 working hours.', 'Senza impegno. Rispondiamo entro 24 ore lavorative.'],
@@ -104,11 +103,11 @@
     ['Aprèn a fondre en sis passos.', 'Aprende a fundir en seis pasos.', 'Learn to cast in six steps.', 'Impara a fondere in sei passi.'],
     ['Llegeix la guia', 'Lee la guía', 'Read the guide', 'Leggi la guida'],
     ['Tot per fondre metall.', 'Todo para fundir metal.', 'Everything you need to cast metal.', 'Tutto per fondere il metallo.'],
-    ['Sorres, crisols, forns i peces a mida. Fet i enviat des de Manresa.', 'Arenas, crisoles, hornos y piezas a medida. Hecho y enviado desde Manresa.', 'Sands, crucibles, furnaces and custom parts. Made and shipped from Manresa, Spain.', 'Sabbie, crogioli, forni e pezzi su misura. Prodotto e spedito da Manresa.'],
+    ['Sorres de fosa, crisols, forns i peces a mida per a joiers i fundidors.', 'Arenas de fundición, crisoles, hornos y piezas a medida para joyeros y fundidores.', 'Casting sands, crucibles, furnaces and custom parts for jewellers and foundry workers.', 'Sabbie da fonderia, crogioli, forni e pezzi su misura per gioiellieri e fonditori.'],
     ['Compra ara', 'Comprar ahora', 'Shop now', 'Acquista ora'],
     ['Il·lustració d\'un crisol abocant metall fos en un motlle de sorra', 'Ilustración de un crisol vertiendo metal fundido en un molde de arena', 'Illustration of a crucible pouring molten metal into a sand mould', 'Illustrazione di un crogiolo che versa metallo fuso in uno stampo di sabbia'],
     ['Rep el pressupost', 'Recibe el presupuesto', 'Get your quote', 'Ricevi il preventivo'],
-    ['Des del nostre taller de Manresa.', 'Desde nuestro taller de Manresa.', 'From our workshop in Manresa.', 'Dalla nostra officina di Manresa.'],
+    ['Del nostre taller a la teva porta.', 'De nuestro taller a tu puerta.', 'From our workshop to your door.', 'Dalla nostra officina a casa tua.'],
     ['En pagar acceptes les {link}.', 'Al pagar aceptas las {link}.', 'By paying you accept the {link}.', 'Pagando accetti le {link}.'],
     ['condicions de venda', 'condiciones de venta', 'terms of sale', 'condizioni di vendita'],
     ["Preus amb IVA inclòs, llevat que s'indiqui el contrari. L'enviament es calcula al pagament, segons el transportista que triïs. Les empreses poden veure els preus sense IVA amb l'opció de sota.", "Precios con IVA incluido, salvo que se indique lo contrario. El envío se calcula al pagar, según el transportista que elijas. Las empresas pueden ver los precios sin IVA con la opción de abajo.", "Prices include VAT unless stated otherwise. Shipping is calculated at checkout, based on the carrier you choose. Businesses can view prices without VAT using the option below.", "Prezzi IVA inclusa, salvo diversa indicazione. La spedizione si calcola al pagamento, in base al corriere scelto. Le aziende possono vedere i prezzi senza IVA con l'opzione qui sotto."],
@@ -138,7 +137,6 @@
     ['Sorres, crisols, flascons i consumibles.', 'Arenas, crisoles, cajas de moldeo y consumibles.', 'Sands, crucibles, flasks and consumables.', 'Sabbie, crogioli, staffe e consumabili.'],
     ['Veure tota la botiga', 'Ver toda la tienda', 'Browse the whole shop', 'Vedi tutto il negozio'],
     ['Enviament en 24–48 h', 'Envío en 24–48 h', 'Ships in 24–48 h', 'Spedizione in 24–48 h'],
-    ['Des de Manresa. {flat}, o gratis a partir de {free}.', 'Desde Manresa. {flat}, o gratis a partir de {free}.', 'From Manresa. {flat}, or free over {free}.', 'Da Manresa. {flat}, o gratis da {free}.'],
     ['Preus per volum', 'Precios por volumen', 'Volume pricing', 'Prezzi per quantità'],
     ['Com més unitats, menys pagues. Descompte aplicat automàticament.', 'Cuantas más unidades, menos pagas. Descuento aplicado automáticamente.', 'The more you buy, the less you pay. Discount applied automatically.', 'Più unità, meno paghi. Sconto applicato automaticamente.'],
     ['Factura d\'empresa', 'Factura de empresa', 'Business invoice', 'Fattura aziendale'],
@@ -186,7 +184,6 @@
     ['Quantitat', 'Cantidad', 'Quantity', 'Quantità'],
     ['En estoc.', 'En stock.', 'In stock.', 'Disponibile.'],
     ['Enviament:', 'Envío:', 'Shipping:', 'Spedizione:'],
-    ['surt en 24–48 h laborables des de Manresa.', 'sale en 24–48 h laborables desde Manresa.', 'dispatched from Manresa within 24–48 working hours.', 'parte da Manresa in 24–48 ore lavorative.'],
     ['Devolucions:', 'Devoluciones:', 'Returns:', 'Resi:'],
     ['14 dies.', '14 días.', '14 days.', '14 giorni.'],
     ['Especificacions', 'Especificaciones', 'Specifications', 'Specifiche'],
@@ -334,7 +331,6 @@
     ['Enviament estimat (Península)', 'Envío estimado (Península)', 'Estimated shipping (mainland Spain)', 'Spedizione stimata (Spagna peninsulare)'],
     ['per agència, {price} a la Península.', 'por agencia, {price} en la Península.', 'by courier, {price} to mainland Spain.', 'con corriere, {price} in Spagna peninsulare.'],
     ['des de {price} a la Península, gratuït a partir de {free}.', 'desde {price} en la Península, gratis a partir de {free}.', 'from {price} to mainland Spain, free over {free}.', 'da {price} in Spagna peninsulare, gratis da {free}.'],
-    ['Surt en 24–48 h laborables des de Manresa.', 'Sale en 24–48 h laborables desde Manresa.', 'Ships from Manresa within 24–48 working hours.', 'Parte da Manresa in 24–48 ore lavorative.'],
     ['Recollida:', 'Recogida:', 'Collection:', 'Ritiro:'],
     ['gratuïta al taller de Manresa.', 'gratis en el taller de Manresa.', 'free from our workshop in Manresa.', 'gratuito presso l\'officina di Manresa.'],
 
@@ -425,6 +421,51 @@
     ['Propà', 'Propano', 'Propane', 'Propano'],
     ['Refractari', 'Refractario', 'Refractory', 'Refrattario'],
     ['Exterior', 'Exterior', 'Outdoors', 'Esterno'],
+    // Compte de client
+    ['Hola, {name}', 'Hola, {name}', 'Hello, {name}', 'Ciao, {name}'],
+    ['Hem omplert les teves dades. Revisa-les i paga.', 'Hemos rellenado tus datos. Revísalos y paga.', 'We\'ve filled in your details. Check them and pay.', 'Abbiamo compilato i tuoi dati. Controllali e paga.'],
+    ['El meu compte', 'Mi cuenta', 'My account', 'Il mio account'],
+    ['Desa aquestes dades per a la propera compra', 'Guardar estos datos para la próxima compra', 'Save these details for next time', 'Salva questi dati per il prossimo acquisto'],
+    ['Ja tens compte?', '¿Ya tienes cuenta?', 'Already have an account?', 'Hai già un account?'],
+    ['Entra', 'Entra', 'Sign in', 'Accedi'],
+    ['i no hauràs d\'escriure res. Si no, continua: no cal compte per comprar.', 'y no tendrás que escribir nada. Si no, continúa: no hace falta cuenta para comprar.', 'and you won\'t have to type anything. If not, just carry on: you don\'t need an account to buy.', 'e non dovrai scrivere nulla. Altrimenti continua: non serve un account per acquistare.'],
+    ['Crea el teu compte en 2 minuts', 'Crea tu cuenta en 2 minutos', 'Create your account in 2 minutes', 'Crea il tuo account in 2 minuti'],
+    ['Hi desarem el nom, el correu i l\'adreça d\'aquesta comanda perquè la propera vegada no hagis d\'escriure res. Només cal triar una contrasenya.', 'Guardaremos el nombre, el correo y la dirección de este pedido para que la próxima vez no tengas que escribir nada. Solo hay que elegir una contraseña.', 'We\'ll save the name, email and address from this order so you won\'t have to type anything next time. You only need to choose a password.', 'Salveremo nome, email e indirizzo di questo ordine così la prossima volta non dovrai scrivere nulla. Basta scegliere una password.'],
+    ['Contrasenya (mínim 8 caràcters)', 'Contraseña (mínimo 8 caracteres)', 'Password (at least 8 characters)', 'Password (almeno 8 caratteri)'],
+    ['Crea el compte', 'Crear la cuenta', 'Create account', 'Crea l\'account'],
+    ['La comanda ja és al teu compte.', 'El pedido ya está en tu cuenta.', 'The order is already in your account.', 'L\'ordine è già nel tuo account.'],
+    ['Nova contrasenya', 'Nueva contraseña', 'New password', 'Nuova password'],
+    ['Desa la contrasenya', 'Guardar la contraseña', 'Save password', 'Salva la password'],
+    ['Compte', 'Cuenta', 'Account', 'Account'],
+    ['Desa les teves dades i compra més ràpid. No cal compte per comprar.', 'Guarda tus datos y compra más rápido. No hace falta cuenta para comprar.', 'Save your details and buy faster. You don\'t need an account to buy.', 'Salva i tuoi dati e acquista più in fretta. Non serve un account per acquistare.'],
+    ['Contrasenya', 'Contraseña', 'Password', 'Password'],
+    ['He oblidat la contrasenya', 'He olvidado la contraseña', 'I forgot my password', 'Ho dimenticato la password'],
+    ['En crear el compte acceptes la {link}.', 'Al crear la cuenta aceptas la {link}.', 'By creating an account you accept the {link}.', 'Creando l\'account accetti l\'{link}.'],
+    ['política de privadesa', 'política de privacidad', 'privacy policy', 'informativa sulla privacy'],
+    ['Les meves dades d\'enviament', 'Mis datos de envío', 'My shipping details', 'I miei dati di spedizione'],
+    ['Desa les dades', 'Guardar los datos', 'Save details', 'Salva i dati'],
+    ['Les meves comandes', 'Mis pedidos', 'My orders', 'I miei ordini'],
+    ['Carregant…', 'Cargando…', 'Loading…', 'Caricamento…'],
+    ['Surt', 'Salir', 'Sign out', 'Esci'],
+    ['Esborra el meu compte', 'Borrar mi cuenta', 'Delete my account', 'Elimina il mio account'],
+    ['T\'hem enviat un correu per confirmar el compte. Obre\'l i torna aquí per entrar.', 'Te hemos enviado un correo para confirmar la cuenta. Ábrelo y vuelve aquí para entrar.', 'We\'ve emailed you to confirm the account. Open it and come back here to sign in.', 'Ti abbiamo inviato un\'email per confermare l\'account. Aprila e torna qui per accedere.'],
+    ['Escriu el teu correu a dalt i torna a prémer aquí.', 'Escribe tu correo arriba y vuelve a pulsar aquí.', 'Type your email above and press here again.', 'Scrivi la tua email sopra e premi di nuovo qui.'],
+    ['Si aquest correu té compte, hi rebràs un enllaç per posar una contrasenya nova.', 'Si este correo tiene cuenta, recibirás un enlace para poner una contraseña nueva.', 'If this email has an account, you\'ll get a link to set a new password.', 'Se questa email ha un account, riceverai un link per impostare una nuova password.'],
+    ['Dades desades.', 'Datos guardados.', 'Details saved.', 'Dati salvati.'],
+    ['Segur que vols esborrar el teu compte i les teves dades? No es pot desfer. Les comandes ja fetes es conserven per obligació comptable, però sense lligar-les a tu.', '¿Seguro que quieres borrar tu cuenta y tus datos? No se puede deshacer. Los pedidos ya hechos se conservan por obligación contable, pero sin vincularlos a ti.', 'Are you sure you want to delete your account and data? This cannot be undone. Past orders are kept for accounting reasons, but no longer linked to you.', 'Sei sicuro di voler eliminare il tuo account e i tuoi dati? Non si può annullare. Gli ordini già fatti vengono conservati per obbligo contabile, ma non più collegati a te.'],
+    ['Segueix-la', 'Seguirlo', 'Track it', 'Segui'],
+    ['Encara no has fet cap comanda.', 'Todavía no has hecho ningún pedido.', 'You haven\'t placed any orders yet.', 'Non hai ancora fatto nessun ordine.'],
+    ['Pagada', 'Pagado', 'Paid', 'Pagato'],
+    ['Enviada', 'Enviado', 'Shipped', 'Spedito'],
+    ['Lliurada', 'Entregado', 'Delivered', 'Consegnato'],
+    ['Cancel·lada', 'Cancelado', 'Cancelled', 'Annullato'],
+    ['El correu o la contrasenya no són correctes.', 'El correo o la contraseña no son correctos.', 'The email or password is not correct.', 'L\'email o la password non sono corrette.'],
+    ['Aquest correu ja té un compte. Entra amb la teva contrasenya.', 'Este correo ya tiene una cuenta. Entra con tu contraseña.', 'This email already has an account. Sign in with your password.', 'Questa email ha già un account. Accedi con la tua password.'],
+    ['La contrasenya ha de tenir com a mínim 8 caràcters.', 'La contraseña debe tener al menos 8 caracteres.', 'The password must be at least 8 characters.', 'La password deve avere almeno 8 caratteri.'],
+    ['Massa intents seguits. Torna-ho a provar d\'aquí a una estona.', 'Demasiados intentos seguidos. Vuelve a probar dentro de un rato.', 'Too many attempts in a row. Please try again in a while.', 'Troppi tentativi consecutivi. Riprova tra un po\'.'],
+    ['No s\'ha pogut fer. Torna-ho a provar.', 'No se ha podido hacer. Vuelve a intentarlo.', 'That didn\'t work. Please try again.', 'Non è stato possibile. Riprova.'],
+    ['No s\'ha pogut desar. Torna-ho a provar.', 'No se ha podido guardar. Vuelve a intentarlo.', 'Could not save. Please try again.', 'Impossibile salvare. Riprova.'],
+    ['Cal iniciar sessió.', 'Hay que iniciar sesión.', 'Please sign in.', 'Devi accedere.'],
     // Cancel·lació
     ['T\'hem retornat {amount} a la targeta. El banc pot trigar entre 5 i 10 dies laborables a mostrar-ho.', 'Te hemos devuelto {amount} a la tarjeta. El banco puede tardar entre 5 y 10 días laborables en mostrarlo.', 'We have refunded {amount} to your card. Your bank may take 5 to 10 working days to show it.', 'Ti abbiamo rimborsato {amount} sulla carta. La banca può impiegare da 5 a 10 giorni lavorativi per mostrarlo.'],
     ['Vols cancel·lar la comanda?', '¿Quieres cancelar el pedido?', 'Want to cancel the order?', 'Vuoi annullare l\'ordine?'],
@@ -536,11 +577,35 @@
   const dict = {};
   S.forEach((row) => { dict[row[0]] = row; });
 
-  let lang = 'ca';
+  // Idioma per defecte segons el lloc d'on entres (si l'usuari no n'ha triat cap):
+  //  1. Si el navegador té el català entre els seus idiomes -> català.
+  //  2. Si no, el país (la funció "botiga" el diu a partir de la IP; mentrestant, la zona horària).
+  //  3. Si no, l'idioma del navegador, i si la botiga no hi és, anglès.
+  // Quan hi hagi més idiomes (francès, alemany, portuguès) només cal afegir-los aquí.
+  const BY_COUNTRY = { ES: 'es', AD: 'ca', FR: 'fr', IT: 'it', SM: 'it', VA: 'it', PT: 'pt', DE: 'de', AT: 'de', LI: 'de', CH: 'de', GB: 'en', IE: 'en', MT: 'en' };
+  const BY_ZONE = { 'Europe/Madrid': 'es', 'Atlantic/Canary': 'es', 'Africa/Ceuta': 'es', 'Europe/Andorra': 'ca', 'Europe/Paris': 'fr', 'Europe/Rome': 'it', 'Europe/Lisbon': 'pt', 'Atlantic/Azores': 'pt', 'Europe/Berlin': 'de', 'Europe/Vienna': 'de', 'Europe/Zurich': 'de', 'Europe/London': 'en', 'Europe/Dublin': 'en' };
+  const supported = (l) => (ORDER.includes(l) ? l : '');
+  const browserLangs = () => [...(navigator.languages || []), navigator.language || ''].map((l) => String(l).slice(0, 2).toLowerCase()).filter(Boolean);
+  function guessLang(country) {
+    const langs = browserLangs();
+    if (langs.includes('ca')) return 'ca';
+    let zone = '';
+    try { zone = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch { /* res */ }
+    const place = country ? BY_COUNTRY[country] : BY_ZONE[zone];
+    if (place) return supported(place) || 'en'; // país conegut però idioma encara no disponible: anglès
+    return supported(langs.find(supported) || '') || (country || zone.startsWith('Europe/') ? 'en' : 'ca');
+  }
+
+  let lang = '';
   try { lang = localStorage.getItem('fc.lang') || ''; } catch { /* mode privat */ }
-  if (!ORDER.includes(lang)) {
-    const nav = (navigator.language || 'ca').slice(0, 2);
-    lang = ORDER.includes(nav) ? nav : 'ca';
+  // Les pàgines /es/, /en/ i /it/ (SEO) manen sobre la resta: l'adreça ja diu l'idioma.
+  const inPath = /^\/(es|en|it)(\/|$)/.exec(location.pathname);
+  if (inPath) lang = inPath[1];
+  let chosen = ORDER.includes(lang); // l'usuari ja ha triat idioma (o l'adreça el fixa): no el toquem mai
+  if (!chosen) {
+    let geo = null;
+    try { geo = JSON.parse(localStorage.getItem('fc.geo')); } catch { /* res */ }
+    lang = guessLang(geo && Date.now() - geo.at < 7 * 864e5 ? geo.c : '');
   }
 
   const fill = (str, vars) => (vars ? str.replace(/\{(\w+)\}/g, (_, k) => (k in vars ? vars[k] : `{${k}}`)) : str);
@@ -609,14 +674,37 @@
     t,
     localizeData,
     applyStatic,
-    set(next) {
-      if (!ORDER.includes(next) || next === lang) return;
+    set(next, auto = false) {
+      if (!ORDER.includes(next)) return;
+      if (!auto) { chosen = true; try { localStorage.setItem('fc.lang', next); } catch { /* mode privat */ } }
+      if (next === lang) return;
       lang = next;
-      try { localStorage.setItem('fc.lang', lang); } catch { /* mode privat */ }
       if (window.FUNDICAT_DATA) localizeData(window.FUNDICAT_DATA);
       applyStatic();
       listeners.forEach((fn) => fn());
     },
     subscribe: (fn) => listeners.add(fn),
   };
+
+  // País de la visita (només la funció "botiga" el veu, a partir de la IP; no es guarda enlloc més que aquí).
+  // Es consulta una vegada per setmana i només si l'usuari no ha triat idioma.
+  (function geo() {
+    const B = window.FUNDICAT_BACKEND;
+    if (chosen || !B || B.type !== 'supabase') return;
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem('fc.geo')); } catch { /* res */ }
+    if (saved && Date.now() - saved.at < 7 * 864e5) return;
+    const ctl = new AbortController();
+    setTimeout(() => ctl.abort(), 4000);
+    fetch(B.url + '/functions/v1/botiga/geo', { headers: { apikey: B.key }, signal: ctl.signal })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((g) => {
+        if (!g || !/^[A-Z]{2}$/.test(g.country || '')) return;
+        try { localStorage.setItem('fc.geo', JSON.stringify({ c: g.country, r: g.region || '', at: Date.now() })); } catch { /* res */ }
+        if (chosen) return;
+        const next = (g.country === 'ES' && g.region === 'CT') ? 'ca' : guessLang(g.country);
+        window.I18N.set(next, true);
+      })
+      .catch(() => {});
+  })();
 })();

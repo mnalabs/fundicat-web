@@ -1,9 +1,9 @@
 // Service worker de la botiga: fa que s'obri ràpid des de la pantalla d'inici
 // i que es pugui consultar sense connexió (amb l'últim catàleg descarregat).
 // El panell d'administració i l'API privada no es desen mai a la memòria cau.
-const CACHE = 'fundicat-v16';
+const CACHE = 'fundicat-v18';
 const SHELL = [
-  '/', '/css/styles.css', '/js/i18n.js', '/js/config.js', '/js/boot.js', '/js/shipping.js', '/js/legal.js', '/js/store.js', '/js/app.js',
+  '/', '/css/styles.css', '/js/i18n.js', '/js/config.js', '/js/boot.js', '/js/shipping.js', '/js/legal.js', '/js/account.js', '/js/store.js', '/js/app.js',
   '/manifest.webmanifest', '/marca/favicon.svg', '/marca/icon-192.png', '/marca/icon-512.png',
 ];
 
@@ -26,7 +26,7 @@ self.addEventListener('fetch', (e) => {
   if (req.mode === 'navigate' || url.pathname === '/api/catalog.js') {
     e.respondWith(
       fetch(req)
-        .then((res) => { if (res.ok) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(req.mode === 'navigate' ? '/' : req, copy)); } return res; })
+        .then((res) => { if (res.ok && (req.mode !== 'navigate' || url.pathname === '/')) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(req.mode === 'navigate' ? '/' : req, copy)); } return res; })
         .catch(() => caches.match(req.mode === 'navigate' ? '/' : req, { ignoreSearch: true })),
     );
     return;
