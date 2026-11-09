@@ -577,23 +577,24 @@
   const dict = {};
   S.forEach((row) => { dict[row[0]] = row; });
 
-  // Idioma per defecte segons el lloc d'on entres (si l'usuari no n'ha triat cap):
-  //  1. Si el navegador té el català entre els seus idiomes -> català.
-  //  2. Si no, el país (la funció "botiga" el diu a partir de la IP; mentrestant, la zona horària).
-  //  3. Si no, l'idioma del navegador, i si la botiga no hi és, anglès.
-  // Quan hi hagi més idiomes (francès, alemany, portuguès) només cal afegir-los aquí.
+  // Idioma per defecte (si l'usuari no n'ha triat cap): castellà a tot Espanya i per defecte.
+  // Als altres països, l'idioma del país si la botiga el té (italià...); si no, el del navegador
+  // si la botiga el té; si no, anglès a Europa. Qui vulgui català el tria al selector.
   const BY_COUNTRY = { ES: 'es', AD: 'ca', FR: 'fr', IT: 'it', SM: 'it', VA: 'it', PT: 'pt', DE: 'de', AT: 'de', LI: 'de', CH: 'de', GB: 'en', IE: 'en', MT: 'en' };
   const BY_ZONE = { 'Europe/Madrid': 'es', 'Atlantic/Canary': 'es', 'Africa/Ceuta': 'es', 'Europe/Andorra': 'ca', 'Europe/Paris': 'fr', 'Europe/Rome': 'it', 'Europe/Lisbon': 'pt', 'Atlantic/Azores': 'pt', 'Europe/Berlin': 'de', 'Europe/Vienna': 'de', 'Europe/Zurich': 'de', 'Europe/London': 'en', 'Europe/Dublin': 'en' };
   const supported = (l) => (ORDER.includes(l) ? l : '');
   const browserLangs = () => [...(navigator.languages || []), navigator.language || ''].map((l) => String(l).slice(0, 2).toLowerCase()).filter(Boolean);
   function guessLang(country) {
     const langs = browserLangs();
-    if (langs.includes('ca')) return 'ca';
     let zone = '';
     try { zone = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch { /* res */ }
     const place = country ? BY_COUNTRY[country] : BY_ZONE[zone];
-    if (place) return supported(place) || 'en'; // país conegut però idioma encara no disponible: anglès
-    return supported(langs.find(supported) || '') || (country || zone.startsWith('Europe/') ? 'en' : 'ca');
+    if (place === 'es') return 'es';
+    if (supported(place)) return place;
+    const own = langs.find((l) => supported(l) && l !== 'ca');
+    if (own) return own;
+    if (place || country || zone.startsWith('Europe/')) return 'en'; // Europa amb idioma encara no disponible
+    return 'es';
   }
 
   let lang = '';
@@ -702,7 +703,7 @@
         if (!g || !/^[A-Z]{2}$/.test(g.country || '')) return;
         try { localStorage.setItem('fc.geo', JSON.stringify({ c: g.country, r: g.region || '', at: Date.now() })); } catch { /* res */ }
         if (chosen) return;
-        const next = (g.country === 'ES' && g.region === 'CT') ? 'ca' : guessLang(g.country);
+        const next = guessLang(g.country);
         window.I18N.set(next, true);
       })
       .catch(() => {});
