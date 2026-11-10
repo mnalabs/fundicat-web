@@ -392,6 +392,7 @@
     return `
       <div class="page">
         <div class="page-head"><h1>Productes</h1><a class="btn" href="#/productes/nou">Afegeix un producte</a></div>
+        ${(() => { const miss = draft.products.filter((p) => p.status === 'active' && !shipReady(p)); return miss.length ? `<div class="note">${miss.length === 1 ? '1 producte actiu no té' : `${miss.length} productes actius no tenen`} el pes o les mides de la caixa. Sense aquestes dades, l'enviament es calcula amb la caixa estàndard i pot sortir car o curt: ${miss.slice(0, 6).map((p) => `<a href="#/productes/${esc(p.id)}">${esc(p.name)}</a>`).join(', ')}${miss.length > 6 ? '…' : ''}.</div>` : ''; })()}
         <div class="card card-flush">
           <div class="toolbar">
             <div class="filters">${f('all', 'Tots')}${f('active', 'Actius')}${f('draft', 'Esborranys')}</div>
@@ -403,7 +404,7 @@
             <tbody>${list.map((p) => `
               <tr data-href="#/productes/${esc(p.id)}">
                 <td><a class="pname" href="#/productes/${esc(p.id)}" style="color:inherit;text-decoration:none">${thumb(p)}<span>${esc(p.name)}<small>${esc(p.variant)}</small></span></a></td>
-                <td>${statusBadge(p)}</td>
+                <td>${statusBadge(p)}${p.status === 'active' && !shipReady(p) ? ' <span class="badge">Sense pes o mides</span>' : ''}</td>
                 <td class="hide-sm">${esc(categoryName(p.category))}</td>
                 <td class="num ${p.stock < 10 ? 'low' : ''}">${p.stock}</td>
                 <td class="num">${eur(p.price)}</td>
@@ -413,6 +414,9 @@
         </div>
       </div>`;
   };
+
+  // Té el necessari per calcular l'enviament sol: pes, i mides si no és voluminós.
+  const shipReady = (p) => Number(p.weight) > 0 && (p.oversize || (Number(p.dims?.l) > 0 && Number(p.dims?.w) > 0 && Number(p.dims?.h) > 0));
 
   function productEditor(id) {
     const p = draft.products.find((x) => x.id === id);
@@ -925,6 +929,7 @@
                 ${statusSelect(o).replace('<select', '<select class="inline-input"')}
                 <p class="muted small">Pagament: ${esc({ card: 'Targeta (Stripe)', bizum: 'Bizum', transfer: 'Transferència' }[o.method] || o.method)}${o.payment?.paidAt ? ` · cobrat el ${fmtDate(o.payment.paidAt)}` : ''}${o.payment?.paymentIntent ? ` · <a href="https://dashboard.stripe.com/payments/${esc(o.payment.paymentIntent)}" target="_blank" rel="noopener">veure a Stripe</a>` : ''}</p>
                 ${o.status === 'nova' ? `<p class="muted small">${o.method === 'transfer' ? PAID_HELP.transfer : PAID_HELP.card}</p><button type="button" class="btn" data-paid="${esc(o.number)}">Marca com a pagada</button>` : ''}
+                ${o.invoiceNumber ? `<p class="muted small">Factura <b>${esc(o.invoiceNumber)}</b> · <a href="/#/factura?n=${encodeURIComponent(o.number)}&k=${encodeURIComponent(o.invoiceToken || '')}" target="_blank" rel="noopener">Veure-la o descarregar-la</a>${o.creditNumber ? ` · Rectificativa <b>${esc(o.creditNumber)}</b> · <a href="/#/factura?n=${encodeURIComponent(o.number)}&k=${encodeURIComponent(o.invoiceToken || '')}&tipus=r" target="_blank" rel="noopener">Veure-la</a>` : ''}</p>` : ''}
                 ${o.emailLog && Object.keys(o.emailLog).length ? `<p class="muted small">Correus enviats al client: ${Object.entries(o.emailLog).map(([k, v]) => `${({ paid: 'confirmació', shipped: 'enviament', delivered: 'lliurament', cancelled: 'cancel·lació' }[k] || esc(k))} (${fmtDate(v)})`).join(', ')}.</p>` : ''}
                 ${o.status === 'cancel·lada' ? `<p class="muted small">Cancel·lada${o.cancelledAt ? ` el ${fmtDate(o.cancelledAt)}` : ''}${o.cancelBy ? ` pel ${esc(o.cancelBy)}` : ''}.${o.refund?.amount ? ` Reemborsats ${eur(o.refund.amount)} al client.` : ''}${o.refund?.manual ? ' <b>Cal tornar els diners al client a mà</b> (no es va pagar amb targeta).' : ''}</p>` : ''}
                 ${['nova', 'pagada'].includes(o.status) ? `<hr style="border:0;border-top:1px solid var(--line);margin:12px 0"><p class="muted small">${o.status === 'nova' ? 'Encara no està pagada: es cancel·la sense cap cost.' : o.method === 'card' && o.payment?.paymentIntent ? 'Reemborsa tot l\'import al client a Stripe i torna l\'estoc.' : 'No es va cobrar amb targeta: hauràs de tornar els diners a mà. L\'estoc es retorna.'}${o.label ? ' <b>Ja té etiqueta: avisa el transportista si ja l\'havies creat.</b>' : ''}</p><button type="button" class="btn btn-ghost" data-cancel-order="${esc(o.number)}">Cancel·la la comanda</button>` : ''}

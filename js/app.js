@@ -139,6 +139,7 @@
   };
 
   const ICON = {
+    back: '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M12 8L5 15l7 7"/><path d="M5 15h17a8 8 0 0 1 0 16h-5"/></svg>',
     truck: '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M3 9h18v15H3zM21 14h6l5 5v5H21z"/><circle cx="9" cy="26" r="2.5" fill="var(--alt)"/><circle cx="26" cy="26" r="2.5" fill="var(--alt)"/></svg>',
     stack: '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M18 5l13 7-13 7-13-7z"/><path d="M5 18l13 7 13-7M5 24l13 7 13-7"/></svg>',
     doc: '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M9 4h13l6 6v22H9z"/><path d="M22 4v6h6M13 17h11M13 22h11M13 27h7"/></svg>',
@@ -225,12 +226,14 @@
   const PIN = '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M18 32s10-9.5 10-17a10 10 0 0 0-20 0c0 7.5 10 17 10 17z"/><circle cx="18" cy="15" r="3.5"/></svg>';
 
   views.home = () => {
-    const kit = catalog.byId('kit-inici');
     const freeFrom = config.shipping.zones?.[0]?.freeFrom || 0;
     const free = pricing.rawMoney(freeFrom);
     const hasTiers = catalog.list({}).some((p) => (p.tiers || []).length);
     const cats = catalog.categories().map((c) => ({ c, p: catalog.list({ cat: c.id })[0] })).filter((x) => x.p || x.c.image);
     const h = catalog.home();
+    // Productes de portada: recomanats o, si no n'hi ha (p. ex. ja són a la cistella), els de la botiga
+    const recItems = recommend.forYou(10);
+    const homeItems = recItems.length ? recItems : catalog.list({}).slice(0, 10);
     return `
     <section class="hero-dark ${h.heroImage ? 'has-photo' : ''}">
       ${h.heroImage ? `<img class="hero-photo" src="${esc(h.heroImage)}" alt="">` : ''}
@@ -239,7 +242,7 @@
         <p class="lead">${esc(h.heroLead || t('Sorres de fosa, crisols, forns i peces a mida per a joiers i fundidors.'))}</p>
         <div class="cta-row">
           <a class="btn btn-lg btn-light" href="#/botiga">${t('Compra ara')}</a>
-          <a class="btn btn-lg btn-outline-light" href="#/#serveis">${t('Encarrega una peça')}</a>
+          <a class="btn btn-lg btn-outline-light" href="#/serveis">${t('Encarrega una peça')}</a>
         </div>
       </div>
       ${h.heroImage ? '' : `<div class="hero-art">${POUR_ART(t('Il·lustració d\'un crisol abocant metall fos en un motlle de sorra'))}</div>`}
@@ -250,59 +253,11 @@
         <div>${ICON.truck}<span><b>${t('Tria el transportista')}</b>${freeFrom > 0 ? t('Gratis a partir de {free}.', { free }) : t('Preu real de cada transportista, al pagament.')}</span></div>
         ${hasTiers ? `<div>${ICON.stack}<span><b>${t('Preus per volum')}</b>${t('Descompte automàtic a la cistella.')}</span></div>` : `<div>${ICON.stack}<span><b>${t('Pagament segur')}</b>${t('Amb targeta, a la pàgina segura de Stripe.')}</span></div>`}
         <div>${ICON.doc}<span><b>${t('Factura d\'empresa')}</b>${t('Amb NIF i preus sense IVA.')}</span></div>
-        <div>${PIN}<span><b>${t('Fet a Manresa')}</b>${t('Taller propi a la Catalunya central.')}</span></div>
+        <div>${ICON.back}<span><b>${t('Cancel·lació fàcil')}</b>${t('Des del teu compte o el seguiment, abans que surti.')}</span></div>
       </div>
     </section>
 
-    <section class="svc-home" id="serveis">
-      <div class="wide">
-        <div class="svc-home-head">
-          <div>
-            <h2>${t('Fabriquem la teva peça.')}</h2>
-            <p>${t('Fundició, mecanitzat, disseny CAD/CAM i impressió 3D en un sol taller. Resposta en 24 hores.')}</p>
-          </div>
-          <a class="btn btn-lg" href="#/#pressupost-rapid">${t('Demana pressupost')}</a>
-        </div>
-        <div class="svc-grid">
-          ${catalog.services().map((x) => `
-            <article class="svc-card">
-              ${ICON[x.icon]}
-              <h3>${esc(x.name)}</h3>
-              <p>${esc(x.short)}</p>
-              <div class="svc-links">
-                <a class="link" href="#/servei/${x.slug}">${t('Més informació')}</a>
-                <a class="link" href="#/servei/${x.slug}#pressupost">${t('Demana pressupost')}</a>
-              </div>
-            </article>`).join('')}
-        </div>
-        <div class="quick" id="pressupost-rapid">
-          <div class="quick-how">
-            <h3>${t('Com funciona')}</h3>
-            <ol>
-              ${[
-                ['Explica\'ns què necessites', 'Un plànol, una foto, una mostra o només la idea.'],
-                ['Rep el pressupost', 'Preu per unitat i per volum, sense compromís.'],
-                ['Fabriquem i t\'ho enviem', 'Del nostre taller a la teva porta.'],
-              ].map(([h, p], i) => `<li><span class="n">${i + 1}</span><div><b>${t(h)}</b><span>${t(p)}</span></div></li>`).join('')}
-            </ol>
-            ${catalog.customParts()[0] ? `<p class="quick-proof">${t('Preus de referència: {part}, des de {price}/u.', { part: esc(catalog.customParts()[0].name), price: pricing.rawMoney(catalog.customParts()[0].unit) })}</p>` : ''}
-          </div>
-          <form class="quick-form" id="quote" novalidate>
-            <h3>${t('Pressupost ràpid')}</h3>
-            <p class="muted small">${t('Sense compromís. Et responem en 24 hores laborables.')}</p>
-            <div class="field-row">
-              <label class="field"><span>${t('Nom o empresa')}</span><input name="name" required></label>
-              <label class="field"><span>${t('Correu electrònic')}</span><input name="email" type="email" required></label>
-            </div>
-            <label class="field"><span>${t('Servei')}</span><select name="service">${catalog.services().map((x) => `<option value="${x.id}">${esc(x.name)}</option>`).join('')}</select></label>
-            <label class="field"><span>${t('Què necessites')}</span><textarea name="part" rows="3" required placeholder="${esc(t('Casquet guia Ø 3,80 mm, recanvi de bronze, prototip…'))}"></textarea></label>
-            <button class="btn btn-lg btn-block" type="submit">${t('Envia la sol·licitud')}</button>
-          </form>
-        </div>
-      </div>
-    </section>
-
-    <section class="section cats-section">
+    ${cats.length >= 3 ? `<section class="section cats-section">
       <div class="wide">
         <div class="section-title"><h2>${t('Compra per categoria.')}</h2></div>
         <div class="cat-tiles">
@@ -313,26 +268,22 @@
             </a>`).join('')}
         </div>
       </div>
-    </section>
+    </section>` : ''}
+
+    ${homeItems.length ? `<div class="wide home-row">${row(recommend.personalised() && recItems.length ? 'Recomanats per a tu' : 'Imprescindibles del taller', homeItems, { link: '#/botiga', linkText: 'Veure tota la botiga' })}</div>` : ''}
 
     ${promos()}
 
-    <section class="tiles">
-      ${kit ? `<article class="tile">
-        <h2>${t('Kit d\'iniciació')}</h2>
-        <p>${t('Tot el que cal per a la primera colada.')}</p>
-        <div class="cta-row">
-          <button class="btn" data-add="${kit.id}">${t('Compra')}</button>
-          <a class="link" href="#/producte/${kit.slug}">${t('Més informació')}</a>
-        </div>
-        ${art(kit)}
-      </article>` : `<article class="tile">
+    <section class="tiles home-tiles">
+      <article class="tile">
         <h2>${t('Peces a mida')}</h2>
         <p>${t('Fundició, mecanitzat, CAD/CAM i impressió 3D per encàrrec.')}</p>
         <div class="cta-row">
-          <a class="btn" href="#/#pressupost-rapid">${t('Demana pressupost')}</a>
+          <a class="btn" href="#/serveis#pressupost-rapid">${t('Demana pressupost')}</a>
+          <a class="link" href="#/serveis">${t('Veure els serveis')}</a>
         </div>
-      </article>`}
+        <ul class="tile-list">${catalog.services().map((x) => `<li><a href="#/servei/${x.slug}">${esc(x.name)}</a></li>`).join('')}</ul>
+      </article>
       <article class="tile tile-dark">
         <h2>${t('Guia de fosa en sorra')}</h2>
         <p>${t('Aprèn a fondre en sis passos.')}</p>
@@ -340,12 +291,10 @@
           <a class="btn" href="#/guia">${t('Llegeix la guia')}</a>
         </div>
         <ol class="spec-list guide-mini">
-          ${['Prepara la sorra', 'Fes el motlle', 'Obre els canals', 'Treu el model', 'Fon i cola', 'Desemmotlla'].map((x, i) => `<li><span>${i + 1}. ${t(x)}</span></li>`).join('')}
+          ${['Prepara la sorra', 'Fes el motlle', 'Obre els canals', 'Treu el model', 'Fon i cola', 'Desemmotlla'].map((x, n) => `<li><span>${n + 1}. ${t(x)}</span></li>`).join('')}
         </ol>
       </article>
-    </section>
-
-    <div class="wide" style="padding-block:72px 96px">${row(recommend.personalised() ? 'Recomanats per a tu' : 'Imprescindibles del taller', recommend.forYou(10), { link: '#/botiga', linkText: 'Veure tota la botiga' })}</div>`;
+    </section>`;
   };
 
   // Els recomanats ara viuen dins la botiga.
@@ -448,8 +397,9 @@
     if (!lines.length) {
       return `<section class="wrap empty-cart"><h1>${t('La cistella és buida.')}</h1><p class="lead">${t('La PetroBond és un bon punt de partida.')}</p><a class="btn btn-lg" href="#/botiga">${t('Continua comprant')}</a></section>`;
     }
-    const tot = cart.totals();
-    const freeFrom = config.shipping.zones?.[0]?.freeFrom || 0;
+    const dest = shipDest.get();
+    const tot = cart.totals(dest || undefined);
+    const freeFrom = (dest && tot.quote.freeFrom) || config.shipping.zones?.[0]?.freeFrom || 0;
     const pct = freeFrom > 0 ? Math.min(100, (tot.subtotal / freeFrom) * 100) : 0;
     return `
     <section class="wrap page-head"><h1>${t('Cistella')}</h1><p class="lead">${t('Total: {total}', { total: m(tot.total) })}</p><a class="btn btn-lg head-pay" href="#/checkout">${t('Tramita la comanda')}</a></section>
@@ -477,11 +427,49 @@
             <button class="icon-btn" data-remove="${l.id}" aria-label="${esc(t('Treu {name}', { name: l.product.name }))}">✕</button>
           </li>`).join('')}
         </ul>
+        ${shipCalcHTML(lines, tot, dest)}
       </div>
-      ${summary(tot, `<a class="btn btn-lg btn-block" href="#/checkout">${t('Tramita la comanda')}</a>`, t('Enviament estimat (Península)'))}
+      ${summary(tot, `<a class="btn btn-lg btn-block" href="#/checkout">${t('Tramita la comanda')}</a>`, dest ? t('Enviament a {zip}', { zip: esc(dest.zip) }) : t('Enviament estimat (Península)'))}
     </section>
     <div class="wide" style="padding-bottom:72px">${row('Completa la teva compra', recommend.completeCart(), { sub: 'Complements del que tens a la cistella.' })}</div>`;
   };
+
+  // Destinació per calcular l'enviament a la cistella (es recorda en aquest navegador).
+  const shipDest = {
+    get() { try { const d = JSON.parse(localStorage.getItem('fc.dest')); return d && d.zip ? d : null; } catch { return null; } },
+    set(d) { try { localStorage.setItem('fc.dest', JSON.stringify({ country: d.country, zip: String(d.zip).trim().slice(0, 10) })); } catch { /* mode privat */ } },
+  };
+
+  // Pes i paquets de la cistella: el servidor reparteix els productes en paquets
+  // (com a molt 30 kg i 100 cm cadascun) amb el pes i les mides de cada producte.
+  function shipCalcHTML(lines, tot, dest) {
+    const kg = Math.round(lines.reduce((n, l) => n + (Number(l.product.weight) || 1) * l.qty, 0) * 10) / 10;
+    const live = dest && carriers.enabled() ? carriers.matching(dest) : [];
+    const best = live.length ? live.reduce((a, b) => (b.price < a.price ? b : a)) : null;
+    const pk = live.length && carriers.parcel ? carriers.parcel : null;
+    let out;
+    if (dest && carriers.enabled() && carriers.loading) out = t('Consultant els preus dels transportistes…');
+    else if (best) {
+      out = `${best.price ? t('Des de {price} amb {carrier}.', { price: `<b>${m(best.price)}</b>`, carrier: esc(best.carrier) }) : t('Enviament gratuït amb {carrier}.', { carrier: esc(best.carrier) })}`
+        + (pk ? ` <span class="muted">${pk.packages > 1 ? t('{n} paquets, {kg} kg.', { n: pk.packages, kg: String(pk.kg).replace('.', ',') }) : t('1 paquet, {kg} kg.', { kg: String(pk.kg).replace('.', ',') })}</span>` : '');
+    } else if (dest && carriers.enabled() && carriers.key === carriers.destKey(dest) && carriers.reason === 'oversize') {
+      out = t('Aquesta comanda és voluminosa o molt gran i va per agència. Escriu-nos i et passem el preu de l\'enviament.');
+    } else if (dest && tot.quote.unavailable === 'zone') {
+      out = t('De moment no enviem a aquesta adreça. Escriu-nos i ho mirem.');
+    } else if (dest && tot.option) {
+      out = tot.option.price ? t('Enviament estimat: {price}.', { price: `<b>${m(tot.option.price)}</b>` }) : t('Enviament gratuït.');
+    } else out = t('Escriu el codi postal i et diem què costa l\'enviament.');
+    return `<div class="ship-calc">
+      <form id="ship-calc" class="ship-calc-form" novalidate>
+        <span class="ship-calc-title">${t('Calcula l\'enviament')}</span>
+        <select name="country" aria-label="${t('País')}">${config.countries.map((c) => `<option value="${c}" ${c === (dest?.country || 'Espanya') ? 'selected' : ''}>${t(c)}</option>`).join('')}</select>
+        <input name="zip" inputmode="numeric" autocomplete="postal-code" placeholder="${t('Codi postal')}" value="${esc(dest?.zip || '')}" maxlength="10" aria-label="${t('Codi postal')}" required>
+        <button class="btn btn-sm" type="submit">${t('Calcula')}</button>
+      </form>
+      <p class="ship-calc-out" aria-live="polite">${out}</p>
+      <p class="muted small">${t('Pes de la cistella: {kg} kg. El preu es torna a calcular sol cada vegada que canvies la cistella.', { kg: String(kg).replace('.', ',') })}</p>
+    </div>`;
+  }
 
   // ---------- Enviament ----------
   const SHIP_LABEL = {
@@ -629,11 +617,59 @@
     </section>`;
   };
 
-  // Cada servei té la seva pàgina; l'antiga llista porta al bloc de serveis de la portada
-  // (o al formulari de contacte si l'enllaç anava al pressupost).
+  // Pàgina de serveis: tots els serveis i el pressupost ràpid (abans era a la portada).
   views.serveis = () => {
-    location.replace(parse().anchor === 'pressupost' ? '#/contacte#pressupost' : '#/#serveis');
-    return '';
+    if (parse().anchor === 'pressupost') { location.replace('#/contacte#pressupost'); return ''; }
+    return `
+    <section class="svc-home svc-page" id="serveis">
+      <div class="wide">
+        <div class="svc-home-head">
+          <div>
+            <h1>${t('Fabriquem la teva peça.')}</h1>
+            <p>${t('Fundició, mecanitzat, disseny CAD/CAM i impressió 3D en un sol taller. Resposta en 24 hores.')}</p>
+          </div>
+          <a class="btn btn-lg" href="#/serveis#pressupost-rapid">${t('Demana pressupost')}</a>
+        </div>
+        <div class="svc-grid">
+          ${catalog.services().map((x) => `
+            <article class="svc-card">
+              ${ICON[x.icon]}
+              <h3>${esc(x.name)}</h3>
+              <p>${esc(x.short)}</p>
+              <div class="svc-links">
+                <a class="link" href="#/servei/${x.slug}">${t('Més informació')}</a>
+                <a class="link" href="#/servei/${x.slug}#pressupost">${t('Demana pressupost')}</a>
+              </div>
+            </article>`).join('')}
+        </div>
+        <div class="quick" id="pressupost-rapid">
+          <div class="quick-how">
+            <h3>${t('Com funciona')}</h3>
+            <ol>
+              ${[
+                ['Explica\'ns què necessites', 'Un plànol, una foto, una mostra o només la idea.'],
+                ['Rep el pressupost', 'Preu per unitat i per volum, sense compromís.'],
+                ['Fabriquem i t\'ho enviem', 'Del nostre taller a la teva porta.'],
+              ].map(([h, p], i) => `<li><span class="n">${i + 1}</span><div><b>${t(h)}</b><span>${t(p)}</span></div></li>`).join('')}
+            </ol>
+            ${catalog.customParts()[0] ? `<p class="quick-proof">${t('Preus de referència: {part}, des de {price}/u.', { part: esc(catalog.customParts()[0].name), price: pricing.rawMoney(catalog.customParts()[0].unit) })}</p>` : ''}
+          </div>
+          <form class="quick-form" id="quote" novalidate>
+            <h3>${t('Pressupost ràpid')}</h3>
+            <p class="muted small">${t('Sense compromís. Et responem en 24 hores laborables.')}</p>
+            <div class="field-row">
+              <label class="field"><span>${t('Nom o empresa')}</span><input name="name" required></label>
+              <label class="field"><span>${t('Correu electrònic')}</span><input name="email" type="email" required></label>
+            </div>
+            <label class="field"><span>${t('Servei')}</span><select name="service">${catalog.services().map((x) => `<option value="${x.id}">${esc(x.name)}</option>`).join('')}</select></label>
+            <label class="field"><span>${t('Què necessites')}</span><textarea name="part" rows="3" required placeholder="${esc(t('Casquet guia Ø 3,80 mm, recanvi de bronze, prototip…'))}"></textarea></label>
+            <button class="btn btn-lg btn-block" type="submit">${t('Envia la sol·licitud')}</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+`;
   };
 
   views.servei = (_, slug) => {
@@ -642,7 +678,7 @@
     const parts = catalog.customParts();
     const others = catalog.services().filter((x) => x.id !== s.id);
     return `
-    <nav class="wrap crumbs" aria-label="${t('Ruta')}"><a href="#/#serveis">${t('Serveis')}</a></nav>
+    <nav class="wrap crumbs" aria-label="${t('Ruta')}"><a href="#/serveis">${t('Serveis')}</a></nav>
     <section class="hero">
       <div class="wrap" style="padding-bottom:72px">
         <div class="svc-hero-icon">${ICON[s.icon]}</div>
@@ -835,22 +871,149 @@
         <p class="form-error" id="acct-msg" hidden></p>
       </div></section>`;
     }
-    return `<section class="wrap page-head"><h1>${t('Hola, {name}', { name: esc((Account.name || Account.email).split(' ')[0]) })}</h1><p class="lead">${esc(Account.email)}</p></section>
-    <section class="wrap acct">
-      <form id="acct-profile" novalidate>
-        <h2 style="margin-top:0">${t('Les meves dades d\'enviament')}</h2>
+    const tab = ['comandes', 'dades', 'seguretat'].includes(params.get('tab')) ? params.get('tab') : '';
+    const first = esc((Account.name || Account.email).split(' ')[0]);
+    const crumbs = tab ? `<nav class="wrap crumbs" aria-label="${t('Ruta')}"><a href="#/compte">${t('El meu compte')}</a></nav>` : '';
+    if (tab === 'comandes') {
+      return `${crumbs}<section class="wrap page-head"><h1>${t('Les meves comandes')}</h1><p class="lead">${t('Segueix-les, cancel·la-les o torna-les a comprar.')}</p></section>
+      <section class="wrap acct-wide"><div class="acct-orders2" id="acct-orders" data-limit="50"><p class="muted">${t('Carregant…')}</p></div></section>`;
+    }
+    if (tab === 'dades') {
+      return `${crumbs}<section class="wrap page-head"><h1>${t('Adreça i dades')}</h1><p class="lead">${t('Les farem servir per omplir el pagament i la factura.')}</p></section>
+      <section class="wrap acct"><form id="acct-profile" class="acct-card" novalidate>
         <div id="acct-fields">${profileFields({ name: Account.name })}</div>
         <p class="form-error" id="acct-msg" hidden></p>
         <button class="btn" type="submit">${t('Desa les dades')}</button>
-      </form>
-      <h2>${t('Les meves comandes')}</h2>
-      <ul class="acct-orders" id="acct-orders"><li class="muted">${t('Carregant…')}</li></ul>
-      <div class="acct-actions">
-        <button type="button" class="btn btn-ghost" id="acct-out">${t('Surt')}</button>
-        <button type="button" class="link-btn muted small" id="acct-del">${t('Esborra el meu compte')}</button>
-      </div>
+      </form></section>`;
+    }
+    if (tab === 'seguretat') {
+      return `${crumbs}<section class="wrap page-head"><h1>${t('Inici de sessió i seguretat')}</h1><p class="lead">${esc(Account.email)}</p></section>
+      <section class="wrap acct">
+        <form id="acct-pw" class="acct-card" novalidate>
+          <h2 style="margin-top:0">${t('Canvia la contrasenya')}</h2>
+          <label class="field"><span>${t('Contrasenya nova (mínim 8 caràcters)')}</span><input name="password" type="password" minlength="8" required autocomplete="new-password"></label>
+          <p class="form-error" id="acct-msg" hidden></p>
+          <button class="btn" type="submit">${t('Desa la contrasenya')}</button>
+        </form>
+        <div class="acct-actions">
+          <button type="button" class="btn btn-ghost" id="acct-out">${t('Surt del compte')}</button>
+          <button type="button" class="link-btn muted small" id="acct-del">${t('Esborra el meu compte')}</button>
+        </div>
+      </section>`;
+    }
+    const tiles = [
+      ['#/compte?tab=comandes', 'box', 'Les meves comandes', 'Segueix-les, descarrega les factures o torna-les a comprar.'],
+      ['#/compte?tab=dades', 'pin', 'Adreça i dades', 'Adreça d\'enviament, telèfon i NIF per a la factura.'],
+      ['#/compte?tab=seguretat', 'lock', 'Inici de sessió i seguretat', 'Canvia la contrasenya o surt del compte.'],
+      ['#/botiga', 'bag', 'Botiga', 'Sorres, crisols, equips i consumibles.'],
+      ['#/serveis', 'gear', 'Peces a mida', 'Fundició, mecanitzat, CAD/CAM i impressió 3D.'],
+      ['#/contacte', 'chat', 'Ajuda i contacte', 'Escriu-nos per qualsevol dubte de la comanda.'],
+    ];
+    return `<section class="wrap page-head acct-head"><div><h1>${t('Hola, {name}', { name: first })}</h1><p class="lead">${t('El meu compte')}</p></div><button type="button" class="link-btn" id="acct-out">${t('Surt')}</button></section>
+    <section class="wrap acct-wide">
+      <div id="acct-nudge"></div>
+      <div class="acct-tiles">${tiles.map(([href, ic, h, p]) => `<a class="acct-tile" href="${href}">${ACCT_ICON[ic]}<span><b>${t(h)}</b><span>${t(p)}</span></span></a>`).join('')}</div>
+      <div class="acct-sec-head"><h2>${t('Comandes recents')}</h2><a class="link" href="#/compte?tab=comandes">${t('Veure-les totes')}</a></div>
+      <div class="acct-orders2" id="acct-orders" data-limit="3"><p class="muted">${t('Carregant…')}</p></div>
+      <div id="acct-again"></div>
     </section>`;
   };
+
+  const ACCT_ICON = {
+    box: '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M18 4l13 6v16l-13 6-13-6V10z"/><path d="M5 10l13 6 13-6M18 16v16"/></svg>',
+    pin: PIN,
+    lock: '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><rect x="8" y="16" width="20" height="15" rx="2"/><path d="M12 16v-4a6 6 0 0 1 12 0v4"/><circle cx="18" cy="23" r="1.6"/></svg>',
+    bag: '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M7 12h22l-2 19H9z"/><path d="M13 12V9a5 5 0 0 1 10 0v3"/></svg>',
+    gear: '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><circle cx="18" cy="18" r="4.5"/><path d="M18 4v5M18 27v5M4 18h5M27 18h5M8.1 8.1l3.5 3.5M24.4 24.4l3.5 3.5M8.1 27.9l3.5-3.5M24.4 11.6l3.5-3.5"/></svg>',
+    chat: '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M5 7h26v17H15l-7 6v-6H5z"/><path d="M11 13h14M11 18h9"/></svg>',
+  };
+
+  // ---------- Factura (es desa en PDF amb «Imprimeix») ----------
+  views.factura = () => (Account.enabled
+    ? `<section class="wrap invoice-wrap" id="invoice"><p class="muted">${t('Carregant…')}</p></section>`
+    : views.notFound());
+
+  function invoiceHTML(d, credit) {
+    const S = d.seller || {}; const c = d.customer || {};
+    const rate = Number(d.vatRate) || 0.21; const sign = credit ? -1 : 1;
+    const net = (x) => Math.round((Number(x) || 0) / (1 + rate) * 100) / 100;
+    const eur = (x) => pricing.rawMoney(sign * x);
+    const day = (x) => (x ? new Date(x).toLocaleDateString(window.I18N.locale(), { day: 'numeric', month: 'long', year: 'numeric' }) : '');
+    const rows = (d.lines || []).map((l) => ({ desc: `${l.name || ''}${l.variant ? ` · ${l.variant}` : ''}${l.sku ? ` (${l.sku})` : ''}`, qty: +l.qty || 1, unit: net(l.unit), amount: net(l.total) }));
+    if (Number(d.shipping) > 0) rows.push({ desc: `${t('Enviament')}${d.shippingName ? ` · ${d.shippingName}` : ''}`, qty: 1, unit: net(d.shipping), amount: net(d.shipping) });
+    // La base és la suma de les línies (arrodonides) i l'IVA, la resta fins al total cobrat: així la factura sempre quadra.
+    const base = Math.round(rows.reduce((n, r) => n + r.amount, 0) * 100) / 100;
+    const vat = Math.round((Number(d.total) - base) * 100) / 100;
+    const pay = { card: t('Targeta'), transfer: t('Transferència bancària') }[d.method] || '';
+    return `
+      <article class="invoice">
+        <header class="inv-head">
+          <div class="inv-brand"><b>${esc(S.name || 'Fundicat SL')}</b></div>
+          <div class="inv-title">
+            <h1>${credit ? t('Factura rectificativa') : t('Factura')}</h1>
+            <p><b>${esc(credit ? d.credit : d.invoice)}</b> · ${day(credit ? d.creditDate : d.invoiceDate)}</p>
+            ${credit ? `<p class="small">${t('Rectifica la factura {n} per cancel·lació de la comanda.', { n: esc(d.invoice) })}</p>` : ''}
+          </div>
+        </header>
+        <div class="inv-parties">
+          <div><h2>${t('Emissor')}</h2>
+            <p>${esc(S.name || 'Fundicat SL')}<br>NIF: ${esc(S.nif || t('(pendent)'))}<br>${esc(S.address || '')}${S.email ? `<br>${esc(S.email)}` : ''}</p></div>
+          <div><h2>${t('Client')}</h2>
+            <p>${esc(c.name || '')}${c.nif ? `<br>NIF: ${esc(c.nif)}` : ''}<br>${esc(c.address || '')}<br>${esc([c.zip, c.city].filter(Boolean).join(' '))}<br>${esc(t(c.country || ''))}${c.email ? `<br>${esc(c.email)}` : ''}</p></div>
+        </div>
+        <table class="inv-table">
+          <thead><tr><th>${t('Descripció')}</th><th>${t('Quantitat')}</th><th>${t('Preu unitari')}</th><th>${t('Import')}</th></tr></thead>
+          <tbody>${rows.map((r) => `<tr><td>${esc(r.desc)}</td><td>${r.qty}</td><td>${eur(r.unit)}</td><td>${eur(r.amount)}</td></tr>`).join('')}</tbody>
+        </table>
+        <dl class="inv-totals">
+          <div><dt>${t('Base imposable')}</dt><dd>${eur(base)}</dd></div>
+          <div><dt>${t('IVA ({rate}%)', { rate: Math.round(rate * 100) })}</dt><dd>${eur(vat)}</dd></div>
+          <div class="total"><dt>${t('Total')}</dt><dd>${eur(Number(d.total))}</dd></div>
+        </dl>
+        <p class="inv-foot small">${t('Comanda {n}', { n: esc(d.number) })}${pay ? ` · ${t('Forma de pagament: {pay}', { pay })}` : ''}${S.registry ? `<br>${esc(S.registry)}` : ''}</p>
+      </article>`;
+  }
+
+  async function bindInvoice(params) {
+    const box = $('#invoice'); if (!box) return;
+    const n = params.get('n'); const key = params.get('k'); const credit = params.get('tipus') === 'r';
+    let d;
+    try { d = await Account.invoice(n, key); } catch (err) { box.innerHTML = `<p class="ship-warn">${esc(t(err.message))}</p>`; return; }
+    if (!$('#invoice')) return;
+    if (!d) { box.innerHTML = `<h1>${t('No hem trobat aquesta factura.')}</h1><p class="lead">${t('Entra al teu compte o fes servir l\'enllaç del correu de confirmació.')}</p><a class="btn" href="#/compte">${t('El meu compte')}</a>`; return; }
+    if (d.pending) { box.innerHTML = `<h1>${t('Factura')}</h1><p class="lead">${t('La factura estarà disponible quan rebem el pagament de la comanda {n}.', { n: esc(d.number) })}</p>`; return; }
+    if (credit && !d.credit) { box.innerHTML = `<p class="lead">${t('Aquesta comanda no té factura rectificativa.')}</p>`; return; }
+    const other = credit ? `#/factura?n=${encodeURIComponent(n)}${key ? `&k=${encodeURIComponent(key)}` : ''}` : d.credit ? `#/factura?n=${encodeURIComponent(n)}${key ? `&k=${encodeURIComponent(key)}` : ''}&tipus=r` : '';
+    box.innerHTML = `<div class="invoice-tools no-print">
+        ${Account.loggedIn ? `<a class="link" href="#/compte?tab=comandes">‹ ${t('Les meves comandes')}</a>` : '<span></span>'}
+        <span>${other ? `<a class="link" href="${other}">${credit ? t('Veure la factura original') : t('Veure la factura rectificativa')}</a>` : ''}
+        <button type="button" class="btn btn-sm" id="inv-print">${t('Descarrega en PDF')}</button></span>
+      </div>${invoiceHTML(d, credit)}
+      <p class="muted small no-print">${t('Al quadre d\'impressió, tria «Desa com a PDF».')}</p>`;
+    $('#inv-print').addEventListener('click', () => window.print());
+  }
+
+  // Una comanda a l'àrea de clients: estat, productes i accions (seguir, tornar a comprar).
+  function acctOrderCard(o) {
+    const lines = Array.isArray(o.lines) ? o.lines : [];
+    const again = lines.filter((l) => catalog.byId(l.id)).map((l) => `${l.id}:${Math.max(1, +l.qty || 1)}`).join(',');
+    const state = o.status === 'cancel·lada' ? 'is-off' : o.status === 'lliurada' ? 'is-ok' : '';
+    return `<article class="acct-order">
+      <header><span><span class="muted small">${t('Comanda')}</span><b>${esc(o.number)}</b></span>
+        <span><span class="muted small">${t('Data')}</span><b>${new Date(o.created_at).toLocaleDateString(window.I18N.locale())}</b></span>
+        <span><span class="muted small">${t('Total')}</span><b>${pricing.rawMoney(o.total)}</b></span></header>
+      <div class="acct-order-body">
+        <div><p class="acct-state ${state}">${t(statusName[o.status] || o.status)}</p>
+          <ul>${lines.slice(0, 4).map((l) => `<li>${esc(l.name || '')}${l.variant ? ` · ${esc(l.variant)}` : ''} <span class="muted">× ${+l.qty || 1}</span></li>`).join('')}${lines.length > 4 ? `<li class="muted">${t('i {n} més', { n: lines.length - 4 })}</li>` : ''}</ul></div>
+        <div class="acct-order-act">
+          <a class="btn btn-sm" href="#/seguiment?n=${encodeURIComponent(o.number)}">${o.status === 'enviada' ? t('Segueix l\'enviament') : t('Detalls de la comanda')}</a>
+          ${again ? `<button type="button" class="btn btn-sm btn-secondary" data-rebuy="${esc(again)}">${t('Torna a comprar')}</button>` : ''}
+          ${o.invoice_number ? `<a class="link small" href="#/factura?n=${encodeURIComponent(o.number)}">${t('Factura {n}', { n: esc(o.invoice_number) })}</a>` : ''}
+          ${o.credit_number ? `<a class="link small" href="#/factura?n=${encodeURIComponent(o.number)}&tipus=r">${t('Rectificativa {n}', { n: esc(o.credit_number) })}</a>` : ''}
+        </div>
+      </div>
+    </article>`;
+  }
 
   function bindAccount(params) {
     const msg = (text, ok = false) => { const el = $('#acct-msg'); if (!el) return; el.textContent = t(text); el.hidden = !text; el.style.color = ok ? 'inherit' : ''; };
@@ -886,26 +1049,46 @@
       const f = e.target; if (markInvalid(f)) return;
       try { await Account.setPassword(f.password.value); render(); } catch (err) { msg(err.message); }
     });
-    if (Account.loggedIn && $('#acct-profile')) {
-      Account.profile().then((p) => { if ($('#acct-fields')) $('#acct-fields').innerHTML = profileFields(p || { name: Account.name }); }).catch(() => {});
-      Account.orders().then((rows) => {
-        const el = $('#acct-orders'); if (!el) return;
-        el.innerHTML = rows.length ? rows.map((o) => `<li><span><b>${esc(o.number)}</b> · ${new Date(o.created_at).toLocaleDateString(window.I18N.lang)}<br><span class="muted small">${t(statusName[o.status] || o.status)} · ${pricing.rawMoney(o.total)}</span></span><a class="btn btn-ghost" href="#/seguiment?n=${encodeURIComponent(o.number)}">${t('Segueix-la')}</a></li>`).join('')
-          : `<li class="muted">${t('Encara no has fet cap comanda.')}</li>`;
-      }).catch(() => { const el = $('#acct-orders'); if (el) el.innerHTML = ''; });
-      $('#acct-profile').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const f = e.target; if (markInvalid(f)) return;
-        const btn = $('button[type=submit]', f); btn.disabled = true;
-        try { await Account.saveProfile(Object.fromEntries(new FormData(f))); msg(t('Dades desades.'), true); } catch (err) { msg(err.message); }
-        btn.disabled = false;
-      });
-      $('#acct-out').addEventListener('click', async () => { await Account.signOut(); location.hash = '#/'; render(); });
-      $('#acct-del').addEventListener('click', async () => {
-        if (!window.confirm(t('Segur que vols esborrar el teu compte i les teves dades? No es pot desfer. Les comandes ja fetes es conserven per obligació comptable, però sense lligar-les a tu.'))) return;
-        try { await Account.deleteAccount(); location.hash = '#/'; render(); } catch (err) { msg(err.message); }
-      });
-    }
+    if (!Account.loggedIn) return;
+    $$('#acct-out').forEach((b) => b.addEventListener('click', async () => { await Account.signOut(); location.hash = '#/'; render(); }));
+    if ($('#acct-fields')) Account.profile().then((p) => { if ($('#acct-fields')) $('#acct-fields').innerHTML = profileFields(p || { name: Account.name }); }).catch(() => {});
+    // Avís si encara no hi ha adreça (portada del compte)
+    if ($('#acct-nudge')) Account.profile().then((p) => {
+      const el = $('#acct-nudge'); if (!el || (p && p.address && p.zip)) return;
+      el.innerHTML = `<div class="acct-box acct-nudge"><p><b>${t('Afegeix la teva adreça d\'enviament')}</b> ${t('i el pagament s\'omplirà sol a la propera compra.')}</p><a class="btn btn-sm" href="#/compte?tab=dades">${t('Afegeix-la')}</a></div>`;
+    }).catch(() => {});
+    const list = $('#acct-orders');
+    if (list) Account.orders().then((rows) => {
+      if (!$('#acct-orders')) return;
+      const n = +list.dataset.limit || 3;
+      list.innerHTML = rows.length ? rows.slice(0, n).map(acctOrderCard).join('')
+        : `<div class="acct-empty"><p>${t('Encara no has fet cap comanda.')}</p><a class="btn btn-sm" href="#/botiga">${t('Ves a la botiga')}</a></div>`;
+      // Torna a comprar: productes de comandes anteriors que encara són a la botiga
+      const again = $('#acct-again');
+      if (again) {
+        const seen = new Set(); const items = [];
+        rows.forEach((o) => (o.lines || []).forEach((x) => { const p = catalog.byId(x.id); if (p && !seen.has(p.id)) { seen.add(p.id); items.push(p); } }));
+        if (items.length) again.innerHTML = row('Torna a comprar', items.slice(0, 10), { sub: 'Productes que ja has comprat.' });
+      }
+    }).catch(() => { const el = $('#acct-orders'); if (el) el.innerHTML = `<p class="muted">${t('No s\'han pogut carregar les comandes. Torna-ho a provar.')}</p>`; });
+    $('#acct-profile')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const f = e.target; if (markInvalid(f)) return;
+      const btn = $('button[type=submit]', f); btn.disabled = true;
+      try { await Account.saveProfile(Object.fromEntries(new FormData(f))); msg('Dades desades.', true); } catch (err) { msg(err.message); }
+      btn.disabled = false;
+    });
+    $('#acct-pw')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const f = e.target; if (markInvalid(f)) return;
+      const btn = $('button[type=submit]', f); btn.disabled = true;
+      try { await Account.setPassword(f.password.value); f.reset(); msg('Contrasenya canviada.', true); } catch (err) { msg(err.message); }
+      btn.disabled = false;
+    });
+    $('#acct-del')?.addEventListener('click', async () => {
+      if (!window.confirm(t('Segur que vols esborrar el teu compte i les teves dades? No es pot desfer. Les comandes ja fetes es conserven per obligació comptable, però sense lligar-les a tu.'))) return;
+      try { await Account.deleteAccount(); location.hash = '#/'; render(); } catch (err) { msg(err.message); }
+    });
   }
 
   // Pàgina de gràcies: crea el compte amb les dades de la comanda i només una contrasenya.
@@ -987,6 +1170,7 @@
 
   function bind(name, arg) {
     if (name === 'compte') bindAccount(parse().params);
+    if (name === 'factura') bindInvoice(parse().params);
     if (name === 'comanda') bindQuickAccount();
     if (name === 'seguiment') {
       const form = $('#track-form'); const out = $('#track-result');
@@ -1003,6 +1187,7 @@
         }
         btn.disabled = false; btn.textContent = t('Consulta la comanda');
       });
+      if (parse().params.get('n') && form.email.value) form.requestSubmit();
       out.addEventListener('click', async (e) => {
         const b = e.target.closest('[data-cancel]');
         if (!b) return;
@@ -1058,6 +1243,30 @@
         input.addEventListener('change', () => cart.setQty(id, +input.value || 1));
       });
       $$('[data-remove]').forEach((b) => b.addEventListener('click', () => cart.remove(b.dataset.remove)));
+      // Enviament amb preu real: es torna a demanar quan canvia la cistella o el codi postal.
+      const refreshShip = (dest) => {
+        if (!dest || !carriers.enabled() || carriers.loading || carriers.key === carriers.destKey(dest)) return;
+        const pending = carriers.load(dest);
+        render();
+        pending.then(() => { if (parse().name === 'cistella') { const y = window.scrollY; render(); window.scrollTo(0, y); } });
+      };
+      $('#ship-calc')?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const f = e.target; const zip = f.zip.value.trim();
+        if (zip.length < 4) { f.zip.focus(); return; }
+        shipDest.set({ country: f.country.value, zip });
+        const y = window.scrollY; render(); window.scrollTo(0, y);
+        refreshShip(shipDest.get());
+      });
+      const dest = shipDest.get();
+      if (dest) refreshShip(dest);
+      else if (Account.loggedIn) {
+        Account.profile().then((pr) => {
+          if (!pr?.zip || shipDest.get() || parse().name !== 'cistella') return;
+          shipDest.set({ country: pr.country || 'Espanya', zip: pr.zip });
+          render(); refreshShip(shipDest.get());
+        }).catch(() => {});
+      }
     }
 
     if (name === 'checkout') {
@@ -1106,6 +1315,7 @@
         if (bad) return;
         const btn = $('[type=submit]', form); btn.disabled = true; btn.textContent = t('Processant…');
         const data = Object.fromEntries(new FormData(form));
+        if (data.zip) shipDest.set({ country: data.country, zip: data.zip });
         data.lang = window.I18N.lang; // els correus surten en l'idioma del client
         const saveIt = data.saveProfile && Account.loggedIn;
         delete data.saveProfile;
@@ -1156,6 +1366,13 @@
     if (arrow) {
       const track = document.getElementById(arrow.dataset.scroll);
       track.scrollBy({ left: +arrow.dataset.dir * track.clientWidth * 0.9, behavior: 'smooth' });
+      return;
+    }
+    const rebuy = e.target.closest('[data-rebuy]');
+    if (rebuy) {
+      const items = rebuy.dataset.rebuy.split(',').map((x) => x.split(':')).filter(([id]) => catalog.byId(id));
+      items.forEach(([id, q]) => cart.add(id, Math.max(1, +q || 1)));
+      toast(`<span>${t('S\'han afegit {n} productes a la cistella.', { n: items.length })}</span>${toCart()}`);
       return;
     }
     const many = e.target.closest('[data-add-many]');

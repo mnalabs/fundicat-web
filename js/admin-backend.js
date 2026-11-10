@@ -185,7 +185,7 @@
       number: o.number, date: o.created_at, status: o.status, method: o.method, customer: o.customer, lines: o.lines,
       subtotal: +o.subtotal, shipping: +o.shipping, total: +o.total, vat: +o.vat, delivery: o.delivery,
       label: o.label || undefined, labelError: o.label_error || undefined, carrierStatus: o.carrier_status || undefined,
-      payment: o.payment || undefined, emailLog: o.email_log || undefined, cancelledAt: o.cancelled_at || undefined, cancelBy: o.cancel_by || undefined, refund: o.refund || undefined, shippedAt: o.shipped_at || undefined, deliveredAt: o.delivered_at || undefined,
+      payment: o.payment || undefined, emailLog: o.email_log || undefined, invoiceNumber: o.invoice_number || undefined, creditNumber: o.credit_number || undefined, invoiceToken: o.invoice_token || undefined, cancelledAt: o.cancelled_at || undefined, cancelBy: o.cancel_by || undefined, refund: o.refund || undefined, shippedAt: o.shipped_at || undefined, deliveredAt: o.delivered_at || undefined,
     });
     const mapQuote = (q) => ({ ...q, date: q.created_at });
 

@@ -655,3 +655,96 @@ a.contact-card b { color: var(--link); }
 .track-cancel { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
 .track-cancel h3 { margin: 0 0 6px; font-size: 1rem; }
 .track-cancel .btn { margin-top: 8px; }
+
+/* Àrea de clients (tipus "El meu compte") */
+.acct-wide { margin-bottom: 72px; }
+.acct-head { display: flex; justify-content: space-between; align-items: end; gap: 16px; }
+.acct-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.acct-tile { display: flex; gap: 16px; align-items: flex-start; padding: 22px; border: 1px solid var(--line); border-radius: 16px; background: var(--bg); transition: background .2s, border-color .2s; }
+.acct-tile:hover { background: var(--alt); border-color: var(--faint); }
+.acct-tile svg { width: 34px; height: 34px; flex: none; color: var(--ink); }
+.acct-tile b { display: block; font-weight: 600; font-size: 1.02rem; }
+.acct-tile span span { display: block; color: var(--muted); font-size: .9rem; line-height: 1.4; margin-top: 3px; }
+.acct-nudge { display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.acct-sec-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 44px 0 14px; }
+.acct-sec-head h2 { font-size: 1.4rem; letter-spacing: -.02em; }
+.acct-orders2 { display: grid; gap: 12px; }
+.acct-order { border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+.acct-order header { display: flex; gap: 32px; flex-wrap: wrap; padding: 12px 20px; background: var(--alt); border-bottom: 1px solid var(--line); }
+.acct-order header > span { display: grid; gap: 1px; }
+.acct-order header b { font-weight: 600; font-size: .95rem; }
+.acct-order-body { display: flex; gap: 20px; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; padding: 18px 20px; }
+.acct-order-body ul { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 4px; font-size: .95rem; }
+.acct-state { margin: 0; font-weight: 600; font-size: 1.05rem; }
+.acct-state.is-ok { color: #1a7f37; }
+.acct-state.is-off { color: var(--muted); }
+.acct-order-act { display: grid; gap: 8px; min-width: 200px; }
+.acct-order-act .btn { text-align: center; justify-content: center; }
+.acct-empty { border: 1px dashed var(--line); border-radius: 16px; padding: 28px; text-align: center; }
+.acct-empty p { margin: 0 0 14px; color: var(--muted); }
+#acct-again { margin-top: 32px; }
+@media (max-width: 900px) { .acct-tiles { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px) {
+  .acct-tiles { grid-template-columns: 1fr; }
+  .acct-tile { padding: 16px; }
+  .acct-order header { gap: 18px; padding: 10px 16px; }
+  .acct-order-body { padding: 14px 16px; }
+  .acct-order-act { width: 100%; }
+}
+
+/* Portada ordenada */
+.home-row { padding-block: 56px 72px; }
+.cats-section + .home-row { padding-top: 8px; }
+.home-tiles .tile { min-height: 0; padding-bottom: 48px; }
+.tile-list { list-style: none; margin: 28px auto 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 460px; }
+.tile-list a { display: inline-block; padding: 8px 14px; border-radius: 99px; background: var(--bg); font-size: .9rem; }
+.tile-list a:hover { background: var(--line); }
+.svc-page h1 { font-size: clamp(2.2rem, 5vw, 3.6rem); letter-spacing: -.03em; }
+.btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.btn-ghost:hover { background: var(--alt); opacity: 1; }
+.acct-order-act .btn-secondary { border: 1px solid var(--action); }
+
+/* Cistella: calculadora d'enviament */
+.ship-calc { margin-top: 20px; padding: 18px 20px; border: 1px solid var(--line); border-radius: 16px; }
+.ship-calc-form { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.ship-calc-title { font-weight: 600; margin-right: auto; }
+.ship-calc-form select, .ship-calc-form input { min-height: 34px; padding: 4px 10px; border: 1px solid var(--line); border-radius: 10px; font: inherit; background: var(--bg); color: inherit; }
+.ship-calc-form input { width: 110px; }
+.ship-calc-out { margin: 12px 0 4px; }
+@media (max-width: 600px) { .ship-calc-title { width: 100%; } .ship-calc-form select { flex: 1; } }
+
+/* Factura */
+.invoice-wrap { padding-block: 40px 72px; max-width: 860px; }
+.invoice-tools { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.invoice-tools > span { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.invoice { background: #fff; color: #1d1d1f; border: 1px solid var(--line); border-radius: 12px; padding: 40px; font-size: .95rem; }
+.inv-head { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; border-bottom: 1px solid #d2d2d7; padding-bottom: 20px; }
+.inv-brand b { font-size: 1.3rem; letter-spacing: .04em; }
+.inv-title { text-align: right; }
+.inv-title h1 { font-size: 1.6rem; margin: 0 0 4px; }
+.inv-title p { margin: 0; }
+.inv-parties { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 24px 0; }
+.inv-parties h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: #6e6e73; margin: 0 0 6px; font-weight: 600; }
+.inv-parties p { margin: 0; line-height: 1.5; }
+.inv-table { width: 100%; border-collapse: collapse; }
+.inv-table th { text-align: left; font-size: .8rem; color: #6e6e73; font-weight: 600; border-bottom: 1px solid #d2d2d7; padding: 8px 6px; }
+.inv-table td { padding: 10px 6px; border-bottom: 1px solid #ececf0; vertical-align: top; }
+.inv-table th:not(:first-child), .inv-table td:not(:first-child) { text-align: right; white-space: nowrap; }
+.inv-totals { margin: 18px 0 0 auto; max-width: 300px; display: grid; gap: 6px; }
+.inv-totals div { display: flex; justify-content: space-between; gap: 16px; }
+.inv-totals dt, .inv-totals dd { margin: 0; }
+.inv-totals .total { border-top: 1px solid #d2d2d7; padding-top: 8px; font-weight: 600; font-size: 1.1rem; }
+.inv-foot { margin: 28px 0 0; color: #6e6e73; }
+@media (max-width: 600px) {
+  .invoice { padding: 20px 16px; }
+  .inv-parties { grid-template-columns: 1fr; }
+  .inv-title { text-align: left; }
+  .inv-table { font-size: .85rem; }
+}
+@media print {
+  .site-header, .site-footer, .no-print, #announce, .toast, .install { display: none !important; }
+  body { background: #fff; }
+  .invoice-wrap { padding: 0; max-width: none; }
+  .invoice { border: 0; padding: 0; }
+  @page { margin: 16mm; }
+}

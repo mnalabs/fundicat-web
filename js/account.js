@@ -140,7 +140,18 @@
       profile = rows[0] || row;
       return profile;
     },
-    orders: () => rest('orders?select=number,created_at,status,total,lines,delivery&order=created_at.desc&limit=50'),
+    orders: () => rest('orders?select=number,created_at,status,total,lines,delivery,invoice_number,credit_number&order=created_at.desc&limit=50'),
+    // Dades d'una factura: amb la sessió del client o amb la clau secreta del correu.
+    async invoice(number, key) {
+      const tk = enabled && this.loggedIn ? await token() : null;
+      const res = await fetch(`${B.url}/rest/v1/rpc/order_invoice`, {
+        method: 'POST',
+        headers: { apikey: B.key, Authorization: `Bearer ${tk || B.key}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ p_number: String(number || ''), p_token: /^[0-9a-f-]{36}$/i.test(key || '') ? key : null }),
+      });
+      if (!res.ok) throw new Error('No s\'ha pogut carregar la factura. Torna-ho a provar.');
+      return res.json();
+    },
     // Lliga al compte la comanda que s'acaba de fer sense sessió.
     async claim(order) {
       if (!order?.number || !order?.claim_token) return false;

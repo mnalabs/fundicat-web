@@ -88,7 +88,7 @@
   // Transportistes amb preu real (Packlink): el servidor els demana i els guarda; aquí només
   // es mostren. El preu que paga el client és el que la base de dades llegeix del servidor.
   const carriers = {
-    list: [], key: '', loading: false,
+    list: [], key: '', loading: false, parcel: null, reason: '',
     enabled: () => BACKEND.type === 'supabase' && !!CFG.shipping?.packlink?.enabled,
     cartKey: () => JSON.stringify(cart.lines.map((l) => [l.id, l.qty])),
     destKey(dest) { return `${dest?.country}|${String(dest?.zip || '').trim()}|${this.cartKey()}`; },
@@ -105,6 +105,8 @@
         });
         const data = await res.json().catch(() => ({}));
         if (key !== this.destKey(dest)) return false; // mentrestant l'adreça ha canviat
+        this.parcel = res.ok && data.parcel ? data.parcel : null;
+        this.reason = res.ok ? data.reason || '' : 'error';
         this.list = res.ok && Array.isArray(data.options) ? data.options.map((o) => ({ id: `q:${o.id}`, kind: 'carrier', price: Number(o.price), carrier: o.carrier, name: o.name, hours: o.hours })) : [];
         this.key = key;
         return true;
