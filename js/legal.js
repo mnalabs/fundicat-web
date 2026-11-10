@@ -9,7 +9,7 @@
     const c = config.company || {};
     const pend = { ca: '(pendent)', es: '(pendiente)' };
     return (lang) => ({
-      name: esc(c.name || 'FUNDICAT SL'),
+      name: esc(c.name || 'Fundicat'),
       nif: esc(c.nif || pend[lang]),
       address: esc(c.address || pend[lang]),
       registry: esc(c.registry || ''),

@@ -594,7 +594,7 @@
       <div class="bank-box">
         <h2>${t('Dades per a la transferència')}</h2>
         ${bank.iban ? `<dl>
-          <div><dt>${t('Titular')}</dt><dd>${esc(bank.holder || 'Fundicat SL')}</dd></div>
+          <div><dt>${t('Titular')}</dt><dd>${esc(bank.holder || 'Fundicat')}</dd></div>
           <div><dt>IBAN</dt><dd class="mono">${esc(bank.iban)}</dd></div>
           <div><dt>${t('Import')}</dt><dd>${pricing.rawMoney(o.totals.total)}</dd></div>
           <div><dt>${t('Concepte')}</dt><dd class="mono">${esc(o.number)}</dd></div>
@@ -948,7 +948,7 @@
     return `
       <article class="invoice">
         <header class="inv-head">
-          <div class="inv-brand"><b>${esc(S.name || 'Fundicat SL')}</b></div>
+          <div class="inv-brand"><b>Fundicat</b></div>
           <div class="inv-title">
             <h1>${credit ? t('Factura rectificativa') : t('Factura')}</h1>
             <p><b>${esc(credit ? d.credit : d.invoice)}</b> · ${day(credit ? d.creditDate : d.invoiceDate)}</p>
@@ -957,7 +957,7 @@
         </header>
         <div class="inv-parties">
           <div><h2>${t('Emissor')}</h2>
-            <p>${esc(S.name || 'Fundicat SL')}<br>NIF: ${esc(S.nif || t('(pendent)'))}<br>${esc(S.address || '')}${S.email ? `<br>${esc(S.email)}` : ''}</p></div>
+            <p>${esc(S.name || 'Fundicat')}<br>NIF: ${esc(S.nif || t('(pendent)'))}<br>${esc(S.address || '')}${S.email ? `<br>${esc(S.email)}` : ''}</p></div>
           <div><h2>${t('Client')}</h2>
             <p>${esc(c.name || '')}${c.nif ? `<br>NIF: ${esc(c.nif)}` : ''}<br>${esc(c.address || '')}<br>${esc([c.zip, c.city].filter(Boolean).join(' '))}<br>${esc(t(c.country || ''))}${c.email ? `<br>${esc(c.email)}` : ''}</p></div>
         </div>

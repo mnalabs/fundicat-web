@@ -42,7 +42,7 @@
     ['Enviaments i devolucions', 'Envíos y devoluciones', 'Shipping and returns', 'Spedizioni e resi'],
     ['Contacte', 'Contacto', 'Contact', 'Contatti'],
     ['Manresa, Barcelona', 'Manresa, Barcelona', 'Manresa, Barcelona, Spain', 'Manresa, Barcellona'],
-    ['Copyright © 2026 Fundicat SL. Tots els drets reservats.', 'Copyright © 2026 Fundicat SL. Todos los derechos reservados.', 'Copyright © 2026 Fundicat SL. All rights reserved.', 'Copyright © 2026 Fundicat SL. Tutti i diritti riservati.'],
+    ['Copyright © 2026 Fundicat. Tots els drets reservats.', 'Copyright © 2026 Fundicat. Todos los derechos reservados.', 'Copyright © 2026 Fundicat. All rights reserved.', 'Copyright © 2026 Fundicat. Tutti i diritti riservati.'],
     ['Avís legal', 'Aviso legal', 'Legal notice', 'Note legali'],
     ['Privadesa', 'Privacidad', 'Privacy', 'Privacy'],
     ['Condicions de venda', 'Condiciones de venta', 'Terms of sale', 'Condizioni di vendita'],

@@ -203,7 +203,7 @@
 
   // Dies d'entrega per defecte perquè els camps de Configuració surtin plens.
   function fillShipDefaults() {
-    draft.config.company = { name: "FUNDICAT SL", nif: "", address: "", registry: "", email: "fundicatsl@gmail.com", phone: "623 008 521", ...(draft.config.company || {}) };
+    draft.config.company = { name: "Fundicat", nif: "", address: "", registry: "", email: "fundicatsl@gmail.com", phone: "623 008 521", ...(draft.config.company || {}) };
     const s = draft.config.shipping || (draft.config.shipping = {});
     draft.config.cancel = { hours: 24, ...(draft.config.cancel || {}) };
     s.packlink = { enabled: false, marginPct: 0, marginFixed: 0, addVat: false, ...(s.packlink || {}) };
@@ -1341,11 +1341,11 @@
         <p class="muted small">Surten a l'Avís legal, la Política de privadesa i les Condicions de venda de la botiga. La llei obliga a mostrar el NIF i el domicili.</p>
         ${draft.config.company?.nif && draft.config.company?.address ? '' : '<div class="note">Falten el NIF o el domicili: ara a les pàgines legals hi surt «(pendent)».</div>'}
         <div class="row">
-          <label class="field"><span>Raó social</span><input data-f="config.company.name" maxlength="120"></label>
+          <label class="field"><span>Nom i cognoms (o raó social)</span><input data-f="config.company.name" maxlength="120"></label>
           <label class="field"><span>NIF</span><input data-f="config.company.nif" maxlength="20" placeholder="B00000000"></label>
         </div>
         <label class="field"><span>Domicili fiscal</span><input data-f="config.company.address" maxlength="200" placeholder="Carrer, número, codi postal i població"></label>
-        <label class="field"><span>Dades del Registre Mercantil</span><input data-f="config.company.registry" maxlength="200" placeholder="Inscrita al Registre Mercantil de Barcelona, tom …, foli …, full …"><small>Opcional, però recomanat per a una SL. Surt a l'escriptura o a la gestoria.</small></label>
+        <label class="field"><span>Dades del Registre Mercantil</span><input data-f="config.company.registry" maxlength="200" placeholder="Inscrita al Registre Mercantil de Barcelona, tom …, foli …, full …"><small>Només per a societats. Si ets autònom, deixa-ho en blanc.</small></label>
         <div class="row">
           <label class="field"><span>Correu de contacte</span><input data-f="config.company.email" type="email" maxlength="120"></label>
           <label class="field"><span>Telèfon</span><input data-f="config.company.phone" maxlength="30"></label>
@@ -1367,7 +1367,7 @@
         <p class="muted small">Es mostren al client quan tria pagar per transferència.</p>
         <div class="row">
           <label class="field"><span>IBAN</span><input data-f="config.bank.iban" placeholder="ES00 0000 0000 0000 0000 0000" maxlength="40"></label>
-          <label class="field"><span>Titular</span><input data-f="config.bank.holder" placeholder="Fundicat SL" maxlength="80"></label>
+          <label class="field"><span>Titular</span><input data-f="config.bank.holder" placeholder="Nom del titular del compte" maxlength="80"></label>
         </div>
       </section>
       <section class="card" data-sec="cfg:pagaments">

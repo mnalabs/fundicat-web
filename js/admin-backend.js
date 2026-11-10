@@ -43,7 +43,7 @@
       .bc i { background: #000; display: block; } .test { background: #000; color: #fff; text-align: center; font-weight: 700; padding: 2mm; }
     </style>${list.map((o) => `<section class="l">
       <div class="test">ETIQUETA DE PROVA · NO VÀLIDA PER ENVIAR</div>
-      <div class="s">Remitent: FUNDICAT SL · ${esc(sender)}</div>
+      <div class="s">Remitent: Fundicat · ${esc(sender)}</div>
       <div class="box"><div class="s">Destinatari</div><div class="t">${esc(o.customer.name)}</div>${esc(o.customer.address)}<br>${esc(o.customer.zip)} ${esc(o.customer.city)}<br>${esc(o.customer.country)}${o.customer.phone ? `<br>Tel. ${esc(o.customer.phone)}` : ''}</div>
       <div>Comanda <b>${esc(o.number)}</b> · ${o.delivery?.kg ?? '?'} kg · ${esc(o.delivery?.name || '')}</div>
       <div class="bc">${bars(o.label.tracking)}</div><div class="w">${esc(o.label.tracking)}</div>
@@ -109,7 +109,7 @@
       ...draft.config,
       vat: Math.min(0.5, num(draft.config.vat)),
       cancel: { hours: Math.min(720, Math.max(1, Math.round(Number(draft.config.cancel?.hours)) || 24)) },
-      company: (() => { const c = draft.config.company || {}; return { name: str(c.name, 120) || 'FUNDICAT SL', nif: str(c.nif, 20).toUpperCase().replace(/\s+/g, ''), address: str(c.address, 200), registry: str(c.registry, 200), email: str(c.email, 120), phone: str(c.phone, 30) }; })(),
+      company: (() => { const c = draft.config.company || {}; return { name: str(c.name, 120) || 'Fundicat', nif: str(c.nif, 20).toUpperCase().replace(/\s+/g, ''), address: str(c.address, 200), registry: str(c.registry, 200), email: str(c.email, 120), phone: str(c.phone, 30) }; })(),
       shipping: {
         autoLabel: !!s.autoLabel,
         pickup: { enabled: !!s.pickup?.enabled, address: str(s.pickup?.address, 200) || 'Manresa (Barcelona)' },
