@@ -645,6 +645,26 @@
   S.push(["Rectificativa {n}","Rectificativa {n}","Credit note {n}","Nota di credito {n}"]);
   S.push(["Segueix-les, descarrega les factures o torna-les a comprar.","Síguelos, descarga las facturas o vuelve a comprarlos.","Track them, download invoices or buy again.","Seguili, scarica le fatture o riacquistali."]);
   S.push(["No s'ha pogut carregar la factura. Torna-ho a provar.","No se ha podido cargar la factura. Inténtalo de nuevo.","The invoice could not be loaded. Please try again.","Non è stato possibile caricare la fattura. Riprova."]);
+  // Categories noves i especificacions dels productes (2026-11)
+  S.push(["Microfusió i motlles","Microfusión y moldes","Lost-wax casting and moulds","Microfusione e stampi"]);
+  S.push(["Revestiments, ceres, silicones i cilindres per a la cera perduda.","Revestimientos, ceras, siliconas y cilindros para la cera perdida.","Investments, waxes, silicones and flasks for lost-wax casting.","Rivestimenti, cere, siliconi e cilindri per la cera persa."]);
+  S.push(["Eines de joieria","Herramientas de joyería","Jewellery tools","Utensili per gioielleria"]);
+  S.push(["Alicates, llimes, serres, mandrils i eines de banc per a joiers.","Alicates, limas, sierras, triblets y herramientas de banco para joyeros.","Pliers, files, saws, mandrels and bench tools for jewellers.","Pinze, lime, seghetti, triboletti e utensili da banco per orafi."]);
+  S.push(["Polit i abrasius","Pulido y abrasivos","Polishing and abrasives","Lucidatura e abrasivi"]);
+  S.push(["Pastes, discos, raspalls i fresses per deixar la peça acabada.","Pastas, discos, cepillos y fresas para dejar la pieza acabada.","Compounds, discs, brushes and burs to finish the piece.","Paste, dischi, spazzole e frese per rifinire il pezzo."]);
+  S.push(["Metalls i soldadures","Metales y soldaduras","Metals and solders","Metalli e saldature"]);
+  S.push(["Granalla, lingots, soldadures i lligues per fondre.","Granalla, lingotes, soldaduras y ligas para fundir.","Casting grain, ingots, solders and master alloys.","Graniglia, lingotti, saldature e leghe madri da fondere."]);
+  S.push(["Seguretat i mesura","Seguridad y medición","Safety and measuring","Sicurezza e misura"]);
+  S.push(["Guants, pantalles, davantals, mantes refractàries i piròmetres.","Guantes, pantallas, delantales, mantas refractarias y pirómetros.","Gloves, face shields, aprons, refractory blankets and pyrometers.","Guanti, visiere, grembiuli, coperte refrattarie e pirometri."]);
+  S.push(["Contingut","Contenido","Contents","Contenuto"]);
+  S.push(["Bentonita","Bentonita","Bentonite","Bentonite"]);
+  S.push(["Mides","Medidas","Size","Misure"]);
+  S.push(["Ceràmica","Cerámica","Ceramic","Ceramica"]);
+  S.push(["Alúmina","Alúmina","Alumina","Allumina"]);
+  S.push(["SiC + grafit","SiC + grafito","SiC + graphite","SiC + grafite"]);
+  S.push(["Acer inoxidable","Acero inoxidable","Stainless steel","Acciaio inox"]);
+  S.push(["Ferro colat","Hierro fundido","Cast iron","Ghisa"]);
+  S.push(["Llautó","Latón","Brass","Ottone"]);
   S.forEach((row) => { dict[row[0]] = row; });
 
   // Idioma per defecte (si l'usuari no n'ha triat cap): castellà a tot Espanya i per defecte.

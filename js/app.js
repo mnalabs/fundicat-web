@@ -314,7 +314,7 @@
     </section>
     <section class="wrap" style="padding-bottom:96px">
       <div class="toolbar">
-        <div class="chips">${chip('', t('Tot'))}${catalog.categories().map((c) => chip(c.id, c.name)).join('')}</div>
+        <div class="chips">${chip('', t('Tot'))}${catalog.categories().filter((c) => c.id === cat || catalog.list({ cat: c.id }).length).map((c) => chip(c.id, c.name)).join('')}</div>
         <div class="toolbar-right">
           <label class="search"><span class="sr">${t('Cerca')}</span><input type="search" id="q" placeholder="${t('Cerca')}" value="${esc(q)}"></label>
           <label><span class="sr">${t('Ordena')}</span>
@@ -379,7 +379,7 @@
           ${config.shipping.pickup?.enabled ? `<span><b>${t('Recollida:')}</b> ${t('gratuïta al taller de Manresa.')}</span>` : ''}
           <span><b>${t('Devolucions:')}</b> ${t('14 dies.')}</span>
         </div>
-        <div class="specs"><h2>${t('Especificacions')}</h2><dl style="margin:0">${Object.entries(p.specs).map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></div>
+        <div class="specs"><h2>${t('Especificacions')}</h2><dl style="margin:0">${Object.entries(p.specs).map(([k, v]) => `<div><dt>${esc(t(k))}</dt><dd>${esc(t(v))}</dd></div>`).join('')}</dl></div>
         <div class="prose">${p.description.map((d) => `<p>${esc(d)}</p>`).join('')}</div>
       </div>
     </section>
