@@ -748,3 +748,9 @@ a.contact-card b { color: var(--link); }
   .invoice { border: 0; padding: 0; }
   @page { margin: 16mm; }
 }
+
+/* Mentre carrega la botiga, la versió per a Google (pàgines generades) no es veu i ocupa tota la pantalla,
+   perquè el peu no pugi a dalt. Si el JavaScript no arriba a carregar, es mostra igualment als 4 s. */
+#main.seo-pre { min-height: 100vh; }
+#main.seo-pre > * { visibility: hidden; animation: seo-show 0s 4s forwards; }
+@keyframes seo-show { to { visibility: visible; } }

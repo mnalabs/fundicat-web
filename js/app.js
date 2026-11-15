@@ -1150,6 +1150,7 @@
     rowSeq = 0;
     paintBar();
     main.innerHTML = view(params, arg);
+    main.classList.remove('seo-pre'); // ja es pot ensenyar (vegeu styles.css)
     const navKey = name === 'botiga' && params.get('cat') ? params.get('cat') : ['servei', 'a-mida'].includes(name) ? 'serveis' : name;
     const svcId = name === 'servei' ? catalog.service(arg)?.id : null;
     $$('[data-nav]').forEach((a) => a.classList.toggle('is-active', a.dataset.nav === navKey || a.dataset.nav === svcId));
